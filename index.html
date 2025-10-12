@@ -1440,5 +1440,35 @@
             }, false);
         }
     </script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+
+<script>
+  // Your web app's Firebase configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyDBqvj-n3rXNc9X_nxcD0IUa7zZAiLW_jI",
+      authDomain: "flowcare-prototype.firebaseapp.com",
+      projectId: "flowcare-prototype",
+      storageBucket: "flowcare-prototype.firebasestorage.app",
+      messagingSenderId: "359161389605",
+      appId: "1:359161389605:web:b0a084612b538ae28255cc",
+      measurementId: "G-793Q1XF5WG"
+};
+  // Initialize Firebase
+  firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+
+  // Sign in anonymously
+  auth.signInAnonymously()
+    .then(() => {
+      console.log("Signed in anonymously");
+    })
+    .catch((error) => {
+      console.error("Error signing in anonymously", error);
+    });
+</script>
 </body>
+
 </html>
