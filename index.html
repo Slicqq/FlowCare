@@ -1,0 +1,1444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">FlowCare - Live Application</title>
+    
+    <link rel="icon" type="image/png" href="/Logo.png">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F9FAFB;
+            scroll-behavior: smooth;
+        }
+        .flowcare-primary { background-color: #00A389; }
+        .flowcare-primary-text { color: #00A389; }
+        .flowcare-accent { background-color: #607d8b; }
+        .flowcare-accent-text { color: #607d8b; }
+        .flowcare-primary-light { background-color: #E0F2F1; } 
+        .traffic-low-bg { background-color: #4CAF50; }
+        .traffic-moderate-bg { background-color: #FFC107; }
+        .traffic-high-bg { background-color: #F44336; }
+        .traffic-low-text { color: #4CAF50; }
+        .traffic-moderate-text { color: #FFC107; }
+        .traffic-high-text { color: #F44336; }
+        #analytics-chart-canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        /* Custom styles for active sidebar links */
+        a.sidebar-active-patient, a.sidebar-active-patient:hover {
+            background-color: #00A389;
+            color: white !important;
+            font-weight: 600;
+        }
+         a.sidebar-active-provider, a.sidebar-active-provider:hover {
+            background-color: #607d8b;
+            color: white !important;
+            font-weight: 600;
+        }
+        /* Custom Dropdown Styles */
+        .custom-dropdown-options {
+            transition: all 0.2s ease-in-out;
+            transform-origin: top;
+        }
+        /* --- CHATBOT STYLES --- */
+        #chatbot-widget {
+            z-index: 1000; /* Ensure it's on top of other content */
+            user-select: none; /* Prevents text selection during drag */
+            height: 28rem; /* 448px */
+        }
+        #chatbot-header {
+            cursor: move;
+        }
+    </style>
+</head>
+<body class="min-h-screen">
+
+    <div id="app-container" class="relative">
+
+        <section id="view-landing" class="transition-opacity duration-500 block">
+            <header class="flex justify-between items-center py-5 px-6 md:px-12 lg:px-20 sticky top-0 z-20 bg-white/95 backdrop-blur-sm shadow-sm">
+                <div class="text-2xl font-bold flowcare-primary-text">FlowCare</div>
+                <nav class="hidden md:flex space-x-8 text-gray-600 font-medium">
+                    <a href="#about-us-section" class="hover:text-gray-900" data-translate="nav_about">About Us</a>
+                    <a href="#instructional-video-section" class="hover:text-gray-900" data-translate="nav_howitworks">How It Works</a>
+                    <a href="#pricing-section" class="hover:text-gray-900" data-translate="nav_pricing">Pricing</a>
+                    <a href="#contact-section" class="hover:text-gray-900" data-translate="nav_contact">Contact</a>
+   
+                </nav>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-600 hover:text-gray-900 transition p-2 rounded-full hover:bg-gray-100" title="Change Language" id="language-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 0115 11.236v-1.67A5.996 5.996 0 0010 3.25C9.697 3.25 9.4 3.324 9.123 3.468C8.847 3.611 8.604 3.821 8.398 4.08C8.191 4.339 8.027 4.646 7.915 4.981C7.804 5.316 7.747 5.676 7.747 6.035v1.365a18.01 18.01 0 00-4.75 3.12M4.464 19.34a17.986 17.986 0 0015.072 0M21 12a9 9 0 01-9 9m-9 0a9 9 0 019-9"/>
+                        </svg>
+ 
+                    </button>
+                    <button class="hidden md:block px-4 py-2 text-white flowcare-primary rounded-lg font-semibold hover:bg-opacity-90 transition" id="landing-signup-btn" data-translate="nav_signup">Sign Up</button>
+                </div>
+            </header>
+
+            <main class="p-6 md:p-12 lg:p-20 pt-24 max-w-6xl mx-auto">
+  
+                <div class="text-center max-w-4xl mx-auto mb-16">
+                    <h1 id="main-landing-heading" class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-gray-900 mb-6 leading-tight">
+                        Predict Your Wait. <span class="flowcare-primary-text">Reclaim Your Time.</span>
+                    </h1>
+                    <p id="landing-tagline" class="text-lg text-gray-600">
+                        FlowCare is the definitive med-tech solution providing patients with real-time clinic traffic data for smart booking, and empowering providers with visual insights to optimize staff, minimize bottlenecks, and significantly reduce wait times.
+                    </p>
+                </div>
+
+                <div class="grid md:grid-cols-2 gap-8 mb-20">
+                    <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#00A389] hover:shadow-xl transition duration-300">
+                        <h2 id="card-patient-heading" class="text-2xl font-bold flowcare-primary-text mb-3">Smart Booking (Patient Focus)</h2>
+ 
+                        <p id="card-patient-text" class="text-gray-500">Find clinics by real-time traffic index, not just distance. See expected wait times before you leave the house and book the fastest available slot.</p>
+                    </div>
+                    <div class="bg-white p-8 rounded-xl shadow-lg border-t-4 border-[#607d8b] hover:shadow-xl transition duration-300">
+                        <h2 id="card-provider-heading" class="text-2xl font-bold flowcare-accent-text mb-3">Optimize Operations (Provider Focus)</h2>
+     
+                        <p id="card-provider-text" class="text-gray-500">Gain visual insights into peak/off-peak traffic patterns. Manage your queue digitally and improve patient satisfaction scores immediately.</p>
+                    </div>
+                </div>
+
+                <div id="instructional-video-section" class="pt-16 pb-16 max-w-4xl mx-auto border-t">
+                    <h2 id="guide-heading" class="text-3xl font-bold text-gray-800 mb-8 text-center">Quick Start Guide: How FlowCare Works</h2>
+  
+                    <p id="guide-text" class="text-lg text-gray-600 mb-8 max-w-2xl mx-auto text-center">A simple, step-by-step video guide for our users, especially those new to online booking systems. Learn how to check traffic, find a low-wait clinic, and book your appointment easily.</p>
+                    <div class="relative w-full overflow-hidden rounded-xl shadow-2xl mx-auto max-w-3xl">
+                        <div style="padding-top: 56.25%;">
+                             <iframe class="absolute top-0 left-0 w-full h-full" src="https://www.youtube.com/embed/dQw4w9WgXcQ?rel=0" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen title="FlowCare Instructional Video Placeholder"></iframe>
+                        </div>
+                    </div>
+                    <div class="mt-16">
+                      
+                        <h3 id="process-heading" class="text-2xl font-bold text-gray-700 mb-6 text-center">The FlowCare Process in 3 Steps:</h3>
+                        <ol class="grid md:grid-cols-3 gap-8 text-left">
+                            <li class="p-6 bg-white rounded-xl shadow-md border-b-4 border-current flowcare-primary-text">
+                        
+                                <span class="text-3xl font-extrabold mb-2 block" data-translate="step1_title">1. Check Traffic</span>
+                                <p class="text-gray-600 text-sm" data-translate="step1_text">FlowCare's system constantly updates facility capacity and patient load, resulting in a live Traffic Index (Low, Moderate, High).</p>
+                            </li>
+                   
+                            <li class="p-6 bg-white rounded-xl shadow-md border-b-4 border-current flowcare-accent-text">
+                                <span class="text-3xl font-extrabold mb-2 block" data-translate="step2_title">2. Book Smart</span>
+                                <p class="text-gray-600 text-sm" data-translate="step2_text">Patients select the best time/location based on predicted flow, or providers manage their internal queue visually.</p>
+                            </li>
+                     
+                            <li class="p-6 bg-white rounded-xl shadow-md border-b-4 border-current flowcare-primary-text">
+                                <span class="text-3xl font-extrabold mb-2 block" data-translate="step3_title">3. Provider Optimized</span>
+                                <p class="text-gray-600 text-sm" data-translate="step3_text">This transparency allows clinics to optimize staffing and space utilization, leading to a better experience for everyone.</p>
+                            </li>
+                    
+                        </ol>
+                    </div>
+                </div>
+                
+                <div id="about-us-section" class="pt-10 pb-16 max-w-4xl mx-auto border-t">
+                    <h2 id="mission-heading" class="text-3xl font-bold text-gray-800 mb-4 text-center">Our Mission: Trust Through Transparency</h2>
+                    <p id="mission-text" class="text-lg text-gray-600 text-center">We believe waiting shouldn't be a guessing game. FlowCare uses proprietary machine learning models to analyze patient check-in times, doctor availability, and facility capacity, translating complex data into a simple, color-coded index that saves you time and reduces stress for your staff.</p>
+                </div>
+
+                <div class="pt-10 pb-16 max-w-4xl mx-auto border-t">
+                    <h2 class="text-3xl font-bold text-gray-800 mb-8 text-center" data-translate="trusted_by">Trusted by Leading Healthcare Systems</h2>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-8 opacity-75">
+                        <img src="https://placehold.co/150x50/374151/FFFFFF?text=Apollo+Hospitals" alt="Trust Logo" class="mx-auto" />
+                        <img src="https://placehold.co/150x50/374151/FFFFFF?text=Fortis+Healthcare" alt="Trust Logo" class="mx-auto" />
+                 
+                        <img src="https://placehold.co/150x50/374151/FFFFFF?text=Max+Healthcare" alt="Trust Logo" class="mx-auto hidden sm:block" />
+                        <img src="https://placehold.co/150x50/374151/FFFFFF?text=Narayana+Health" alt="Trust Logo" class="mx-auto hidden md:block" />
+                    </div>
+                </div>
+
+                <div id="pricing-section" class="pt-16 pb-16 max-w-4xl mx-auto border-t text-center">
+                    <h2 id="pricing-heading" class="text-3xl font-bold text-gray-800 mb-4">Pricing</h2>
+                    <p id="pricing-text" class="text-lg text-gray-600">Patient access is <strong>always free</strong>.</p>
+                </div>
+
+                <div id="contact-section" class="pt-16 pb-16 max-w-4xl mx-auto border-t text-center">
+     
+                    <h2 id="contact-heading" class="text-3xl font-bold text-gray-800 mb-4">Get In Touch</h2>
+                    <p id="contact-text" class="text-lg text-gray-600">Email us at support@flowcare.com or call +91 98765 43210. We're ready to answer your questions.</p>
+                    <div class="mt-6 flex justify-center space-x-4">
+                 
+                        <input type="email" id="contact-email" placeholder="Your Email" class="p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]">
+                        <button id="contact-send-btn" class="px-6 py-3 text-white font-semibold flowcare-primary rounded-lg hover:bg-opacity-90 transition" data-translate="contact_send">Send Message</button>
+                    </div>
+                </div>
+
+            
+                <div id="dual-login-section" class="border-t pt-10 mt-10">
+                    <h2 id="login-cta-heading" class="text-2xl font-bold text-gray-800 mb-6 text-center">Ready to get started?</h2>
+                    <div class="flex flex-col sm:flex-row justify-center gap-6">
+                        <button id="cta-register-btn" class="px-8 py-4 text-lg font-bold text-white flowcare-primary rounded-xl shadow-md hover:shadow-lg hover:bg-opacity-90 transition duration-300" data-translate="login_create">
+                            Create Account / Register Clinic
+                        </button>
+                        <button id="cta-signin-btn" class="px-8 py-4 text-lg font-bold text-gray-700 bg-gray-200 rounded-xl shadow-md hover:shadow-lg hover:bg-gray-300 transition duration-300" data-translate="login_signin">
+      
+                            Already a user? Sign In
+                        </button>
+                    </div>
+                </div>
+            </main>
+
+            <footer class="mt-24 text-center text-sm text-gray-400 p-6">
+          
+                &copy; 2025 FlowCare. All rights reserved. | Professional Healthcare Flow Management.
+            </footer>
+        </section>
+
+        <section id="view-registration" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-gray-50 transition-opacity duration-500 overflow-y-auto z-50">
+            <div class="w-full max-w-lg bg-white p-8 rounded-xl shadow-2xl border-t-4 border-[#00A389]">
+                <div class="text-center mb-8">
+                    <div class="text-3xl font-bold flowcare-primary-text mb-1">FlowCare</div>
+                    <h2 class="text-xl font-semibold text-gray-700" data-translate="reg_title">New User/Provider Registration</h2>
+                </div>
+                <form id="registration-form">
+                    <div class="mb-4">
+                 
+                        <label for="reg_type" class="block text-sm font-medium text-gray-700" data-translate="reg_account_type">Account Type</label>
+                        <select id="reg_type" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]">
+                            <option value="patient" data-translate="reg_option_patient">Patient Account</option>
+                      
+                            <option value="provider" data-translate="reg_option_provider">Healthcare Provider/Clinic</option>
+                        </select>
+                    </div>
+                    <div id="reg-otp-section" class="mb-4">
+                        <label for="reg_phone" class="block text-sm font-medium text-gray-700" data-translate="reg_phone_label">Mobile Number</label>
+                        <input type="tel" id="reg_phone" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]" placeholder="+91 98765 43210" required>
+                    </div>
+           
+                    <div id="reg-provider-section" class="hidden">
+                        <div class="mb-4">
+                            <label for="reg_email" class="block text-sm font-medium text-gray-700" data-translate="reg_email_label">Email Address</label>
+    
+                            <input type="email" id="reg_email" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]" placeholder="you@email.com">
+                        </div>
+                        <div class="mb-6">
+                
+                            <label for="reg_password" class="block text-sm font-medium text-gray-700" data-translate="reg_password_label">Password</label>
+                            <input type="password" id="reg_password" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]" placeholder="••••••••">
+                        </div>
+                   
+                    </div>
+                    <button type="submit" class="w-full px-4 py-3 text-white font-bold flowcare-primary rounded-xl shadow-md hover:bg-opacity-90 transition" data-translate="reg_button">
+                        Register Account
+                    </button>
+                </form>
+      
+                <div class="text-center mt-6 text-sm">
+                    <p class="mt-2 text-gray-600">Already Registered? <a href="#" class="font-semibold flowcare-primary-text" id="reg-signin-link" data-translate="login_signin_text">Sign In</a>
+                    </p>
+                </div>
+            </div>
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 close-view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+        </section>
+
+        <section id="view-patient-login" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-gray-50 transition-opacity duration-500 overflow-y-auto z-50">
+            <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border-t-4 border-[#00A389]">
+                <div class="text-center mb-8">
+  
+                    <div class="text-3xl font-bold flowcare-primary-text mb-1">FlowCare</div>
+                    <h2 class="text-xl font-semibold text-gray-700" data-translate="login_patient_title">Patient Login</h2>
+                </div>
+                <form id="patient-login-form">
+                    
+                    <div class="mb-4">
+                        <label for="p_phone" class="block text-sm font-medium text-gray-700" data-translate="reg_phone_label">Mobile Number</label>
+                        <input type="tel" id="p_phone" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]" placeholder="+91 98765 43210" required>
+                    </div>
+          
+                    <button type="submit" class="w-full px-4 py-3 text-white font-bold flowcare-primary rounded-xl shadow-md hover:bg-opacity-90 transition" data-translate="login_button_otp">
+                        Send OTP
+                    </button>
+                </form>
+                <div class="text-center mt-6 text-sm">
+                    <p class="mt-2 text-gray-600" data-translate="login_new_patient">New Patient? <a href="#" class="font-semibold flowcare-primary-text" id="plogin-signup-link" data-translate="login_signup_here">Sign Up Here</a></p>
+                </div>
+            </div>
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 close-view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+ 
+        </section>
+
+        <section id="view-provider-login" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-gray-50 transition-opacity duration-500 overflow-y-auto z-50">
+            <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border-t-4 border-[#607d8b]">
+                <div class="text-center mb-8">
+                    <div class="text-3xl font-bold flowcare-accent-text mb-1">FlowCare</div>
+                    <h2 class="text-xl font-semibold text-gray-700" data-translate="login_provider_title">Provider Login</h2>
+                </div>
+                <form id="provider-login-form">
+                    <div class="mb-4">
+                  
+                        <label for="p_prov_email" class="block text-sm font-medium text-gray-700" data-translate="login_provider_id">Clinic ID / Email</label>
+                        <input type="email" id="p_prov_email" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#607d8b] focus:border-[#607d8b]" placeholder="admin@sahadri.com" required>
+                    </div>
+                    <div class="mb-6">
+        
+                        <label for="p_prov_password" class="block text-sm font-medium text-gray-700" data-translate="reg_password_label">Password</label>
+                        <input type="password" id="p_prov_password" class="mt-1 w-full p-3 border border-gray-300 rounded-lg focus:ring-[#607d8b] focus:border-[#607d8b]" placeholder="••••••••" required>
+                    </div>
+                    <button type="submit" class="w-full px-4 py-3 text-white font-bold flowcare-accent rounded-xl shadow-md hover:bg-opacity-90 transition" data-translate="login_button_provider">
+                        Log In
+                    </button>
+                </form>
+                <div class="text-center mt-6 text-sm">
+          
+                    <p class="mt-2 text-gray-600" data-translate="login_new_provider">New Provider? <a href="#" class="font-semibold flowcare-accent-text" id="prlogin-signup-link" data-translate="login_register_clinic">Register Clinic</a></p>
+                </div>
+            </div>
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 close-view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+            </button>
+  
+        </section>
+
+        <section id="view-login-choice" class="hidden fixed inset-0 flex items-center justify-center p-4 bg-gray-50 transition-opacity duration-500 overflow-y-auto z-50">
+            <div class="w-full max-w-md bg-white p-8 rounded-xl shadow-2xl border-t-4 border-[#00A389]">
+                <div class="text-center mb-8">
+                    <div class="text-3xl font-bold flowcare-primary-text mb-1">FlowCare</div>
+                    <h2 class="text-xl font-semibold text-gray-700" data-translate="login_choice_title">Sign In As...</h2>
+                </div>
+                <div class="space-y-4">
+                    <button id="choice-patient-btn" class="w-full px-4 py-3 text-white font-bold flowcare-primary rounded-xl shadow-md hover:bg-opacity-90 transition" data-translate="reg_option_patient">
+        
+                        Patient
+                    </button>
+                    <button id="choice-provider-btn" class="w-full px-4 py-3 text-white font-bold flowcare-accent rounded-xl shadow-md hover:bg-opacity-90 transition" data-translate="reg_option_provider">
+                        Healthcare Provider
+       
+                    </button>
+                </div>
+            </div>
+            <button class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 close-view-btn">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+       
+            </button>
+        </section>
+
+        <section id="view-patient-dashboard" class="hidden flex h-screen bg-gray-100 transition-opacity duration-500">
+            <nav class="hidden md:block w-64 bg-white shadow-xl p-6 flex-shrink-0">
+                <div class="text-2xl font-bold flowcare-primary-text mb-8">FlowCare</div>
+                <div class="space-y-2">
+    
+                    <a href="#" class="nav-patient-dashboard flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100" data-target="find-clinics">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        <span data-translate="dashboard_find_clinics">Dashboard (Find Clinics)</span>
+ 
+                    </a>
+                    <a href="#" class="nav-patient-dashboard flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100" data-target="my-appointments">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h.01M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                        <span data-translate="dashboard_my_appointments">My Appointments</span>
+                    </a>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100" id="patient-logout-btn">
+                       
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span data-translate="dashboard_logout">Logout</span>
+                    </a>
+                </div>
+       
+            </nav>
+
+            <main class="flex-1 overflow-y-auto p-4 md:p-8">
+                <div id="patient-content-container">
+                    <div id="subview-find-clinics">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-6" data-translate="find_clinics_heading">Find Clinics: Real-Time Traffic</h1>
+         
+                        <div id="patient-next-appointment" class="bg-white p-6 rounded-xl shadow-md mb-8">
+                            </div>
+
+                      
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4" data-translate="search_filter_heading">Search & Filter</h2>
+                        <div class="flex flex-col sm:flex-row gap-4 mb-6">
+                            <input type="text" id="clinic-search" placeholder="Search by Clinic Name or Address..." class="flex-1 p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]">
+                   
+                            <select id="specialty-filter" class="p-3 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]">
+                                <option value="All" data-translate="specialty_all">All Specialties</option>
+                                <option value="General Practice">General Practice</option>
+              
+                                <option value="Pediatrics">Pediatrics</option>
+                                <option value="Cardiology">Cardiology</option>
+                                <option value="Urgent Care">Urgent Care</option>
+             
+                                <option value="Dermatology">Dermatology</option>
+                            </select>
+                        </div>
+                        <div id="clinic-list" class="space-y-4"></div>
+  
+                    </div>
+
+                    <div id="subview-my-appointments" class="hidden">
+                        <h1 class="text-3xl font-bold text-gray-800 mb-6" data-translate="dashboard_my_appointments_heading">My Appointments History</h1>
+                        <div id="appointment-history-list" class="space-y-4">
+   
+                            </div>
+                    </div>
+                </div>
+          
+            </main>
+        </section>
+
+        <section id="view-provider-dashboard" class="hidden flex h-screen bg-gray-100 transition-opacity duration-500">
+            <nav class="hidden md:block w-64 bg-white shadow-xl p-6 flex-shrink-0">
+                <div class="text-2xl font-bold flowcare-accent-text mb-8">FlowCare</div>
+                <div class="space-y-2">
+       
+                    <a href="#" class="nav-provider-dashboard flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100" data-target="queue">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20v-2h-.001a4.975 4.975 0 00-4.72-5.918 3 3 0 01-5.368-2.584M17 20l2 2m-2-2h-2"></path></svg>
+                        <span data-translate="dashboard_queue">Dashboard (Queue)</span>
+ 
+                    </a>
+                    <a href="#" class="nav-provider-dashboard flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100" data-target="analytics">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"></path></svg>
+ 
+                        <span data-translate="dashboard_analytics">Analytics</span>
+                    </a>
+                    <a href="#" class="flex items-center p-3 rounded-lg text-gray-600 hover:bg-gray-100" id="provider-logout-btn">
+                        <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path></svg>
+                        <span data-translate="dashboard_logout">Logout</span>
+                    </a>
+                </div>
+            
+            </nav>
+
+            <main class="flex-1 overflow-y-auto p-4 md:p-8">
+                <h1 id="provider-dashboard-heading" class="text-3xl font-bold text-gray-800 mb-6" data-translate="provider_dashboard_heading">Provider Dashboard: Clinic Flow Management</h1>
+                
+                <div id="provider-content-container">
+                    <div id="subview-queue">
+    
+                        <div class="bg-white p-6 rounded-xl shadow-2xl mb-8 border-t-8 border-[#607d8b]">
+                            <h2 class="text-2xl font-semibold text-gray-700 mb-4" data-translate="queue_status_heading">Real-Time Clinic Status: Urgent Care Wing</h2>
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
+  
+                                <div>
+                                    <p class="text-sm text-gray-500" data-translate="queue_traffic_level">Current Traffic Level</p>
+                             
+                                    <div class="relative mt-1" id="custom-dropdown-container">
+                                        <button type="button" id="custom-dropdown-button" class="text-2xl w-full text-center font-bold text-white rounded-xl py-2 px-4 shadow-md border-0 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-400 flex items-center justify-center">
+                                            <span id="custom-dropdown-value">MODERATE</span>
+                                            <svg class="ml-2 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                              <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                        
+                                            </svg>
+                                        </button>
+                                        
+                                        <div id="custom-dropdown-options" class="custom-dropdown-options hidden absolute mt-1 w-full rounded-xl bg-white shadow-lg z-10 scale-95 opacity-0">
+                                            <div class="py-1">
+                                           
+                                                <a href="#" class="custom-dropdown-item block px-4 py-3 text-lg font-semibold text-white rounded-t-lg traffic-low-bg hover:opacity-90" data-value="LOW">LOW</a>
+                                                <a href="#" class="custom-dropdown-item block px-4 py-3 text-lg font-semibold text-white traffic-moderate-bg hover:opacity-90" data-value="MODERATE">MODERATE</a>
+                        
+                                                <a href="#" class="custom-dropdown-item block px-4 py-3 text-lg font-semibold text-white rounded-b-lg traffic-high-bg hover:opacity-90" data-value="HIGH">HIGH</a>
+                                            </div>
+                    
+                                        </div>
+                                    </div>
+                                    <select id="traffic-level-select" class="hidden">
+      
+                                        <option value="LOW">LOW</option>
+                                        <option value="MODERATE">MODERATE</option>
+                        
+                                        <option value="HIGH">HIGH</option>
+                                    </select>
+                                </div>
+               
+                                <div>
+                                    <p class="text-sm text-gray-500" data-translate="queue_wait_time">Wait Time (Estimated)</p>
+                                    <input type="text" id="provider-wait-time-input" class="text-4xl text-center font-extrabold text-gray-800 mt-1 bg-gray-100 rounded-lg w-full p-2 border-2 border-transparent focus:outline-none focus:ring-2 focus:ring-[#607d8b] focus:border-transparent transition" value="25 Mins">
+                                </div>
+                                <div>
+                      
+                                    <p class="text-sm text-gray-500" data-translate="queue_patients_waiting">Patients Waiting</p>
+                                    <p class="text-4xl font-extrabold text-gray-800 mt-1" id="provider-patients-waiting">7</p>
+                                </div>
+         
+                            </div>
+                        </div>
+
+                        <h2 class="text-xl font-bold text-gray-800 mb-4" data-translate="queue_active_heading">Active Patient Queue</h2>
+                        <div class="bg-white p-5 rounded-xl shadow-md">
+                            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 mb-4 items-end">
+                                <div class="md:col-span-1">
+                               
+                                    <label for="new-patient-name" class="text-xs font-medium text-gray-600" data-translate="add_patient_name">Patient Name</label>
+                                    <input type="text" id="new-patient-name" placeholder="e.g., Priya Sharma" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-[#607d8b] focus:border-[#607d8b]">
+                                </div>
+        
+                                <div class="md:col-span-1">
+                                    <label for="new-patient-phone" class="text-xs font-medium text-gray-600" data-translate="add_patient_phone">Contact Number</label>
+                                 
+                                    <input type="tel" id="new-patient-phone" placeholder="+91..." class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-[#607d8b] focus:border-[#607d8b]">
+                                </div>
+                                <div class="md:col-span-1">
+                     
+                                    <label for="new-patient-reason" class="text-xs font-medium text-gray-600" data-translate="add_patient_reason">Reason for Visit</label>
+                                    <input type="text" id="new-patient-reason" placeholder="e.g., Consultation" class="w-full mt-1 p-2 border border-gray-300 rounded-lg focus:ring-[#607d8b] focus:border-[#607d8b]">
+                              
+                                </div>
+                            </div>
+                            <button id="add-patient-btn" class="w-full px-5 py-2 text-white font-semibold flowcare-accent rounded-lg hover:bg-opacity-90 transition" data-translate="add_patient_btn">Add Patient to Queue</button>
+                            
+                            <div id="provider-queue-list" class="space-y-3 mt-4 border-t pt-4">
+                               </div>
+                        </div>
+       
+                    </div>
+
+                    <div id="subview-analytics" class="hidden">
+                        <h2 class="text-2xl font-bold text-gray-800 mb-4" data-translate="analytics_heading">Flow Analytics & Performance</h2>
+                        <div class="bg-white p-6 rounded-xl shadow-2xl mb-8 border-t-8 border-[#607d8b]">
+  
+                            <h3 class="text-xl font-semibold text-gray-700 mb-4" data-translate="analytics_chart_heading">Average Daily Wait Times (Last 30 Days)</h3>
+                            <div id="analytics-chart-container" class="h-96 w-full rounded-lg border border-gray-200 bg-gray-50 flex items-center justify-center relative">
+                        
+                                <canvas id="analytics-chart-canvas" class="w-full h-full"></canvas>
+                                <p id="canvas-placeholder" class="text-gray-400 absolute">Loading 3D Chart Visualization...</p>
+                            </div>
+                       
+                            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-6">
+                                <div class="text-center p-3 bg-gray-100 rounded-lg">
+                                    <p class="text-xs text-gray-500" data-translate="analytics_avg_wait_time">Average Wait Time</p>
+             
+                                    <p class="text-xl font-bold text-[#607d8b]">18.5 Min</p>
+                                </div>
+                                <div class="text-center p-3 bg-gray-100 rounded-lg">
+     
+                                    <p class="text-xs text-gray-500" data-translate="analytics_appts_booked">Appointments Booked</p>
+                                    <p class="text-xl font-bold text-gray-800">452</p>
+                          
+                                </div>
+                                <div class="text-center p-3 bg-gray-100 rounded-lg">
+                                    <p class="text-xs text-gray-500" data-translate="analytics_peak_hour">Peak Hour (Avg)</p>
+                 
+                                    <p class="text-xl font-bold text-red-500">3:00 PM</p>
+                                </div>
+                                <div class="text-center p-3 bg-gray-100 rounded-lg">
+         
+                                    <p class="text-xs text-gray-500" data-translate="analytics_flow_score">Flow Score Improvement</p>
+                                    <p class="text-xl font-bold text-green-500">+12%</p>
+                             
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+         
+            </main>
+        </section>
+
+    </div>
+
+    <div id="booking-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 transition-opacity duration-300 z-50 overflow-y-auto">
+        <div id="modal-content" class="bg-white w-full max-w-lg p-8 rounded-xl shadow-2xl 
+        border-t-4 border-[#00A389]">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-2xl font-bold flowcare-primary-text" id="modal-clinic-name" data-translate="modal_booking_title">Book Appointment: Clinic Name</h2>
+                <button class="text-gray-400 hover:text-gray-600" id="close-booking-modal-btn">
+                    <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+            </div>
+           
+            <p class="text-lg font-medium text-gray-700 mb-4" data-translate="booking_select_slot">Select an Available Slot:</p>
+
+            <div class="space-y-3" id="booking-slots-container">
+                </div>
+
+            <div class="mt-4">
+                <label for="booking-note" class="block text-sm font-medium text-gray-700" data-translate="booking_optional_note">Optional Note for Clinic (e.g., reason for visit)</label>
+                <textarea id="booking-note" rows="2" class="mt-1 w-full p-2 border border-gray-300 rounded-lg focus:ring-[#00A389] focus:border-[#00A389]" placeholder="Please mention any specific symptoms..."></textarea>
+            </div>
+
+            <div class="mt-6 text-center">
+                <button class="w-full px-4 py-3 text-white font-bold flowcare-primary rounded-xl shadow-md hover:bg-opacity-90 transition" id="confirm-booking-btn" data-translate="modal_confirm_appt">
+                    Confirm Appointment
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="language-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center p-4 transition-opacity duration-300 z-[100]">
+ 
+        <div id="language-modal-content" class="bg-white w-full max-w-sm p-8 rounded-xl shadow-2xl border-t-4 border-[#00A389]">
+            <div class="text-center mb-6">
+                <h2 class="text-2xl font-bold flowcare-primary-text" data-translate="modal_lang_select_heading">Select Language</h2>
+                <p class="text-gray-600 text-sm mt-1" data-translate="modal_lang_select_text">Choose your preferred language for this website.</p>
+            </div>
+           
+            <div class="space-y-3">
+                <button class="lang-select-btn w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition" data-lang="en">
+                    <span class="font-semibold">English</span>
+                </button>
+                <button class="lang-select-btn w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition" data-lang="hi">
+                    <span class="font-semibold">हिन्दी</span> (Hindi)
+                </button>
+                <button class="lang-select-btn w-full text-left p-3 border border-gray-200 rounded-lg hover:bg-gray-100 transition" data-lang="mr">
+                    <span class="font-semibold">मराठी</span> (Marathi)
+           
+                </button>
+            </div>
+
+            <div class="mt-6 text-center">
+                 <button class="text-sm text-gray-500 hover:text-gray-700" id="close-language-modal-btn" data-translate="modal_continue_en">Continue in English</button>
+            </div>
+        </div>
+    </div>
+
+    <button id="chatbot-open-btn" class="fixed bottom-5 right-5 bg-[#00A389] text-white p-3 rounded-full shadow-lg hover:bg-opacity-90 transition z-[999]">
+        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+        </svg>
+    </button>
+    
+    <div id="chatbot-widget" class="hidden fixed bottom-20 right-5 w-80 bg-white rounded-xl shadow-2xl border-t-4 border-[#00A389] flex flex-col transition-transform duration-300">
+        <div id="chatbot-header" class="p-3 bg-gray-100 rounded-t-lg flex justify-between items-center border-b">
+            <h3 class="font-bold text-gray-700 text-sm">FlowCare Assistant</h3>
+            <button id="chatbot-close-btn" class="text-gray-500 hover:text-gray-800 text-2xl leading-none">&times;</button>
+        </div>
+        <div id="chatbot-body" class="p-4 flex-1 overflow-y-auto bg-gray-50">
+            <div class="flex">
+                <div class="p-2 bg-gray-200 rounded-lg text-sm text-gray-800 max-w-[80%]">
+                    Hello! How can I help you today?
+                </div>
+            </div>
+        </div>
+        <div class="p-2 border-t flex bg-white rounded-b-xl">
+            <input type="text" id="chatbot-input" placeholder="Ask a question..." class="flex-1 p-2 border border-gray-300 rounded-l-lg focus:ring-[#00A389] focus:border-[#00A389] text-sm">
+            <button id="chatbot-send-btn" class="px-4 text-white font-semibold flowcare-primary rounded-r-lg hover:bg-opacity-90 transition">Send</button>
+        </div>
+    </div>
+
+
+    <script>
+        // --- MOCK DATA & TRANSLATIONS ---
+        const MOCK_TRANSLATIONS = {
+            'en': { 
+                'main_heading': 'Predict Your Wait. <span class="flowcare-primary-text">Reclaim Your Time.</span>', 
+                'landing_tagline': 'FlowCare is the definitive med-tech solution providing patients with real-time clinic traffic data for smart booking, and empowering providers with visual insights to optimize staff, minimize bottlenecks, and significantly reduce wait times.',
+                'card_patient_heading': 'Smart Booking (Patient Focus)',
+                'card_patient_text': 'Find clinics by real-time traffic index, not just distance. See expected wait times before you leave the house and book the fastest available slot.',
+                'card_provider_heading': 'Optimize Operations (Provider Focus)',
+                'card_provider_text': 'Gain visual insights into peak/off-peak traffic patterns. Manage your queue digitally and improve patient satisfaction scores immediately.',
+                'guide_heading': 'Quick Start Guide: How FlowCare Works',
+                'guide_text': 'A simple, step-by-step video guide for our users, especially those new to online booking systems. Learn how to check traffic, find a low-wait clinic, and book your appointment easily.',
+                'process_heading': 'The FlowCare Process in 3 Steps:',
+                'step1_title': '1. Check Traffic',
+                'step1_text': "FlowCare's system constantly updates facility capacity and patient load, resulting in a live Traffic Index (Low, Moderate, High).",
+                'step2_title': '2. Book Smart',
+                'step2_text': 'Patients select the best time/location based on predicted flow, or providers manage their internal queue visually.',
+                'step3_title': '3. Provider Optimized',
+                'step3_text': 'This transparency allows clinics to optimize staffing and space utilization, leading to a better experience for everyone.',
+                'mission_heading': 'Our Mission: Trust Through Transparency',
+                'mission_text': "We believe waiting shouldn't be a guessing game. FlowCare uses proprietary machine learning models to analyze patient check-in times, doctor availability, and facility capacity, translating complex data into a simple, color-coded index that saves you time and reduces stress for your staff.",
+                'trusted_by': 'Trusted by Leading Healthcare Systems',
+                'pricing_heading': 'Pricing',
+                'pricing_text': 'Patient access is <strong>always free</strong>.',
+                'contact_heading': 'Get In Touch',
+         
+                'contact_text': "Email us at support@flowcare.com or call +91 98765 43210. We're ready to answer your questions.",
+                'contact_send': 'Send Message',
+                'login_cta_heading': 'Ready to get started?',
+                'login_create': 'Create Account / Register Clinic',
+                'login_signin': 'Already a user? Sign In',
+                'nav_about': 'About Us', 'nav_howitworks': 'How It Works', 'nav_pricing': 'Pricing', 'nav_contact': 'Contact', 'nav_signup': 'Sign Up',
+                'reg_title': 'New User/Provider Registration', 'reg_account_type': 'Account Type', 'reg_option_patient': 'Patient Account', 'reg_option_provider': 'Healthcare Provider/Clinic', 'reg_email_label': 'Email Address', 'reg_password_label': 'Password', 'reg_phone_label': 'Mobile Number', 'reg_button': 'Register Account', 'login_signin_text': 'Sign In',
+                'login_patient_title': 'Patient Login', 'login_button': 'Sign In', 'login_button_otp': 'Send OTP', 'login_forgot_password': 'Forgot Password?', 'login_new_patient': 'New Patient?', 'login_signup_here': 'Sign Up Here', 'login_provider_title': 'Provider Login', 'login_provider_id': 'Clinic ID / Email', 'login_button_provider': 'Log In', 'login_new_provider': 'New Provider?', 'login_register_clinic': 'Register Clinic', 'login_choice_title': 'Sign In As...',
+                'dashboard_find_clinics': 'Dashboard (Find Clinics)', 'dashboard_my_appointments': 'My Appointments', 'dashboard_logout': 'Logout', 'find_clinics_heading': 'Find Clinics: Real-Time Traffic', 'next_appt_heading': 'Your Next Appointment', 'confirmed': 'Confirmed',
+                'search_filter_heading': 'Search & Filter', 'specialty_all': 'All Specialties', 'dashboard_my_appointments_heading': 'My Appointments History', 'upcoming': 'Upcoming', 'completed': 'Completed', 'appt_cancel': 'Cancel', 'appt_view_details': 'View Details', 'appt_view_summary': 'View Summary', 'new_appt_cta': 'Need a new appointment?', 'find_clinic_now': 'Find a Clinic Now',
+                'dashboard_queue': 'Dashboard (Queue)', 'dashboard_analytics': 'Analytics', 'provider_dashboard_heading': 'Provider Dashboard: Clinic Flow Management', 'queue_status_heading': 'Real-Time Clinic Status: Urgent Care Wing', 'queue_traffic_level': 'Current Traffic Level', 'queue_wait_time': 'Wait Time (Estimated)', 'queue_patients_waiting': 'Patients Waiting', 'queue_active_heading': 'Active Patient Queue', 'queue_checkin_time': 'Check-In:', 'queue_waiting': 'Waiting', 'queue_move_room': 'Move', 'queue_in_room': 'In Room', 'queue_mark_complete': 'Complete',
+                'analytics_heading': 'Flow Analytics & Performance', 'analytics_chart_heading': 'Average Daily Wait Times (Last 30 Days)', 'analytics_avg_wait_time': 'Average Wait Time', 'analytics_appts_booked': 'Appointments Booked', 'analytics_peak_hour': 'Peak Hour (Avg)', 'analytics_flow_score': 'Flow Score Improvement',
+                'modal_lang_select_heading': 'Select Language', 'modal_lang_select_text': 'Choose your preferred language for this website.', 'modal_continue_en': 'Continue in English', 'modal_booking_title': 'Book Appointment', 'booking_select_slot': 'Select an Available Slot:', 'modal_confirm_appt': 'Confirm Appointment', 'booking_optional_note': 'Optional Note for Clinic (e.g., reason for visit)',
+                'language_set': 'Language set to English.', 'default_lang_code': 'en', 'book_appointment': 'Book Appointment', 'add_patient_btn': 'Add Patient to Queue', 'add_patient_name': 'Patient Name', 'add_patient_phone': 'Contact Number', 'add_patient_reason': 'Reason for Visit'
+      
+            },
+            'hi': { 
+                'main_heading': 'अपनी प्रतीक्षा का अनुमान लगाएं। <span class="flowcare-primary-text">अपना समय वापस पाएं।</span>', 
+                'landing_tagline': 'फ्लोकेयर एक निश्चित मेड-टेक समाधान है जो मरीजों को स्मार्ट बुकिंग के लिए वास्तविक समय में क्लिनिक ट्रैफिक डेटा प्रदान करता है, और प्रदाताओं को कर्मचारियों को अनुकूलित करने, बाधाओं को कम करने और प्रतीक्षा समय को काफी हद तक कम करने के लिए दृश्य अंतर्दृष्टि के साथ सशक्त बनाता है।',
+                'card_patient_heading': 'स्मार्ट बुकिंग (मरीज पर ध्यान)', 'card_patient_text': 'वास्तविक समय के ट्रैफिक इंडेक्स से क्लीनिक खोजें, केवल दूरी से नहीं। घर से निकलने से पहले अनुमानित प्रतीक्षा समय देखें और सबसे तेज़ उपलब्ध स्लॉट बुक करें।',
+                'card_provider_heading': 'ऑपरेशन्स को अनुकूलित करें (प्रदाता पर ध्यान)', 'card_provider_text': 'पीक/ऑफ-पीक ट्रैफिक पैटर्न में दृश्य अंतर्दृष्टि प्राप्त करें। अपनी कतार को डिजिटल रूप से प्रबंधित करें और रोगी संतुष्टि स्कोर में तुरंत सुधार करें।',
+                'guide_heading': 'त्वरित प्रारंभ मार्गदर्शिका: फ्लोकेयर कैसे काम करता है', 'guide_text': 'हमारे उपयोगकर्ताओं के लिए एक सरल, चरण-दर-चरण वीडियो मार्गदर्शिका, विशेष रूप से ऑनलाइन बुकिंग सिस्टम के लिए नए लोगों के लिए। जानें कि ट्रैफिक कैसे जांचें, कम प्रतीक्षा वाला क्लिनिक कैसे ढूंढें, और अपनी अपॉइंटमेंट आसानी से बुक करें।',
+                'process_heading': 'फ्लोकेयर प्रक्रिया 3 चरणों में:', 'step1_title': '1. ट्रैफिक जांचें', 'step1_text': 'फ्लोकेयर का सिस्टम लगातार सुविधा क्षमता और रोगी लोड को अपडेट करता है, जिसके परिणामस्वरूप एक लाइव ट्रैफिक इंडेक्स (कम, मध्यम, उच्च) प्राप्त होता है।',
+                'step2_title': '2. स्मार्ट बुक करें', 'step2_text': 'रोगी अनुमानित प्रवाह के आधार पर सबसे अच्छा समय/स्थान चुनते हैं, या प्रदाता अपनी आंतरिक कतार को दृश्य रूप से प्रबंधित करते हैं।', 'step3_title': '3. प्रदाता अनुकूलित', 'step3_text': 'यह पारदर्शिता क्लीनिकों को स्टाफिंग और अंतरिक्ष उपयोग को अनुकूलित करने की अनुमति देती है, जिससे सभी के लिए बेहतर अनुभव मिलता है।',
+                'mission_heading': 'हमारा मिशन: पारदर्शिता के माध्यम से विश्वास', 'mission_text': 'हम मानते हैं कि प्रतीक्षा करना एक अनुमान लगाने का खेल नहीं होना चाहिए। फ्लोकेयर रोगी चेक-इन समय, डॉक्टर की उपलब्धता, और सुविधा क्षमता का विश्लेषण करने के लिए मालिकाना मशीन लर्निंग मॉडल का उपयोग करता है, जटिल डेटा को एक सरल, रंग-कोडित इंडेक्स में बदल देता है जो आपका समय बचाता है और आपके कर्मचारियों के लिए तनाव कम करता है।',
+                'trusted_by': 'प्रमुख स्वास्थ्य सेवा प्रणालियों द्वारा विश्वसनीय',
+                'pricing_heading': 'मूल्य निर्धारण',
+             
+                'pricing_text': 'रोगी पहुंच <strong>हमेशा मुफ्त</strong> है।',
+                'contact_heading': 'संपर्क करें',
+                'contact_text': "हमें support@flowcare.com पर ईमेल करें या +91 98765 43210 पर कॉल करें। हम आपके सवालों का जवाब देने के लिए तैयार हैं।",
+                'contact_send': 'संदेश भेजें', 'login_cta_heading': 'शुरुआत करने के लिए तैयार हैं?', 'login_create': 'खाता बनाएं / क्लिनिक पंजीकृत करें', 'login_signin': 'पहले से उपयोगकर्ता हैं? साइन इन करें',
+                'nav_about': 'हमारे बारे में', 'nav_howitworks': 'यह कैसे काम करता है', 'nav_pricing': 'मूल्य निर्धारण', 'nav_contact': 'संपर्क', 'nav_signup': 'साइन अप करें',
+                'reg_title': 'नया उपयोगकर्ता/प्रदाता पंजीकरण', 'reg_account_type': 'खाता प्रकार', 'reg_option_patient': 'रोगी खाता', 'reg_option_provider': 'स्वास्थ्य सेवा प्रदाता/क्लिनिक', 'reg_email_label': 'ईमेल एड्रेस', 'reg_password_label': 'पासवर्ड', 'reg_phone_label': 'मोबाइल नंबर', 'reg_button': 'खाता पंजीकृत करें', 'login_signin_text': 'साइन इन करें',
+                'login_patient_title': 'रोगी लॉगिन', 'login_button': 'साइन इन करें', 'login_button_otp': 'ओटीपी भेजें', 'login_forgot_password': 'पासवर्ड भूल गए?', 'login_new_patient': 'नए रोगी?', 'login_signup_here': 'यहां साइन अप करें', 'login_provider_title': 'प्रदाता लॉगिन', 'login_provider_id': 'क्लिनिक आईडी / ईमेल', 'login_button_provider': 'लॉग इन करें', 'login_new_provider': 'नए प्रदाता?', 'login_register_clinic': 'क्लिनिक पंजीकृत करें', 'login_choice_title': 'इस रूप में साइन इन करें...',
+                'dashboard_find_clinics': 'डैशबोर्ड (क्लिनिक खोजें)', 'dashboard_my_appointments': 'मेरी अपॉइंटमेंट्स', 'dashboard_logout': 'लॉगआउट', 'find_clinics_heading': 'क्लिनिक खोजें: वास्तविक समय यातायात', 'next_appt_heading': 'आपकी अगली अपॉइंटमेंट', 'confirmed': 'पुष्टि की गई',
+                
+                'search_filter_heading': 'खोजें और फ़िल्टर करें', 'specialty_all': 'सभी विशेषताएँ', 'dashboard_my_appointments_heading': 'मेरी अपॉइंटमेंट्स का इतिहास', 'upcoming': 'आगामी', 'completed': 'पूर्ण', 'appt_cancel': 'रद्द करें', 'appt_view_details': 'विवरण देखें', 'appt_view_summary': 'सारांश देखें', 'new_appt_cta': 'एक नई अपॉइंटमेंट चाहिए?', 'find_clinic_now': 'अभी क्लिनिक खोजें',
+                'dashboard_queue': 'डैशबोर्ड (कतार)', 'dashboard_analytics': 'विश्लेषण', 'provider_dashboard_heading': 'प्रदाता डैशबोर्ड: क्लिनिक प्रवाह प्रबंधन', 'queue_status_heading': 'वास्तविक समय क्लिनिक स्थिति: तत्काल देखभाल विंग', 'queue_traffic_level': 'वर्तमान यातायात स्तर', 'queue_wait_time': 'प्रतीक्षा समय (अनुमानित)', 'queue_patients_waiting': 'प्रतीक्षारत रोगी', 'queue_active_heading': 'सक्रिय रोगी कतार', 'queue_checkin_time': 'चेक-इन:', 'queue_waiting': 'प्रतीक्षा कर रहा है', 'queue_move_room': 'भेजें', 'queue_in_room': 'कमरे में', 'queue_mark_complete': 'पूर्ण',
+   
+                'analytics_heading': 'प्रवाह विश्लेषण और प्रदर्शन', 'analytics_chart_heading': 'औसत दैनिक प्रतीक्षा समय (पिछले 30 दिन)', 'analytics_avg_wait_time': 'औसत प्रतीक्षा समय', 'analytics_appts_booked': 'बुक की गई अपॉइंटमेंट्स', 'analytics_peak_hour': 'पीक घंटा (औसत)', 'analytics_flow_score': 'प्रवाह स्कोर सुधार',
+                'modal_lang_select_heading': 'भाषा चुनें', 'modal_lang_select_text': 'इस वेबसाइट के लिए अपनी पसंदीदा भाषा चुनें।', 'modal_continue_en': 'अंग्रेजी में जारी रखें', 'modal_booking_title': 'अपॉइंटमेंट बुक करें', 'booking_select_slot': 'एक उपलब्ध स्लॉट चुनें:', 'modal_confirm_appt': 'अपॉइंटमेंट की पुष्टि करें', 'booking_optional_note': 'क्लिनिक के लिए वैकल्पिक नोट (जैसे, आने का कारण)',
+            
+                'language_set': 'भाषा हिंदी पर सेट है।', 'default_lang_code': 'hi', 'book_appointment': 'अपॉइंटमेंट बुक करें', 'add_patient_btn': 'रोगी को कतार में जोड़ें', 'add_patient_name': 'रोगी का नाम', 'add_patient_phone': 'संपर्क संख्या', 'add_patient_reason': 'मिलने का कारण'
+            },
+            'mr': { 
+                'main_heading': 'तुमच्या प्रतीक्षेचा अंदाज घ्या. <span class="flowcare-primary-text">तुमचा वेळ वाचवा.</span>', 
+                'landing_tagline': 'फ्लोकेअर हा एक निश्चित मेड-टेक उपाय आहे जो रुग्णांना स्मार्ट बुकिंगसाठी रिअल-टाइम क्लिनिक ट्रॅफिक डेटा प्रदान करतो आणि प्रदात्यांना कर्मचाऱ्यांची कार्यक्षमता वाढवण्यासाठी, अडथळे कमी करण्यासाठी आणि प्रतीक्षा वेळ लक्षणीयरीत्या कमी करण्यासाठी दृश्य अंतर्दृष्टीने सक्षम करतो।',
+                'card_patient_heading': 'स्मार्ट बुकिंग (रुग्णांवर लक्ष केंद्रित)', 'card_patient_text': 'फक्त अंतरावरुन नाही, तर रिअल-टाइम ट्रॅफिक इंडेक्सवरून दवाखाने शोधा. तुम्ही घराबाहेर पडण्यापूर्वी अंदाजित प्रतीक्षा वेळ पहा आणि सर्वात जलद उपलब्ध स्लॉट बुक करा।',
+                'card_provider_heading': 'ऑपरेशन्स ऑप्टिमाइझ करा (प्रदात्यांवर लक्ष केंद्रित)', 'card_provider_text': 'पीक/नॉन-पीक ट्रॅफिक पॅटर्नमध्ये दृश्य अंतर्दृष्टी मिळवा. तुमची रांग डिजिटली व्यवस्थापित करा आणि रुग्णांचे समाधान स्कोर त्वरित सुधारा।',
+                'guide_heading': 'त्वरित प्रारंभ मार्गदर्शक: फ्लोकेअर कसे कार्य करते', 'guide_text': 'आमच्या वापरकर्त्यांसाठी, विशेषतः ऑनलाइन बुकिंग सिस्टमसाठी नवीन असलेल्यांसाठी एक साधे, चरण-दर-चरण व्हिडिओ मार्गदर्शक. ट्रॅफिक कसे तपासावे, कमी प्रतीक्षा असलेला क्लिनिक कसा शोधावा आणि तुमची अपॉइंटमेंट सहजपणे कशी बुक करावी हे शिका।',
+                'process_heading': 'फ्लोकेअर प्रक्रिया 3 चरणांमध्ये:', 'step1_title': '1. ट्रॅफिक तपासा', 'step1_text': 'फ्लोकेअरची प्रणाली सुविधा क्षमता आणि रुग्ण लोड सतत अपडेट करते, ज्यामुळे थेट ट्रॅफिक इंडेक्स (कमी, मध्यम, उच्च) प्राप्त होतो।',
+                'step2_title': '2. स्मार्ट बुकिंग', 'step2_text': 'रुग्ण अंदाजित प्रवाहावर आधारित सर्वोत्तम वेळ/ठिकाण निवडतात किंवा प्रदाता त्यांची अंतर्गत रांग दृश्यात्मकपणे व्यवस्थापित करतात।', 'step3_title': '3. प्रदाता ऑप्टिमाइझ्ड', 'step3_text': 'ही पारदर्शकता क्लिनिकला कर्मचारी आणि जागेचा वापर ऑप्टिमाइझ करण्याची परवानगी देते, ज्यामुळे प्रत्येकासाठी चांगला अनुभव मिळतो।',
+                'mission_heading': 'आमचे ध्येय: पारदर्शकतेतून विश्वास', 'mission_text': 'आम्हाला विश्वास आहे की वाट पाहणे हा अंदाज लावण्याचा खेळ नसावा. फ्लोकेअर रुग्ण चेक-इन वेळ, डॉक्टरांची उपलब्धता आणि सुविधा क्षमतेचे विश्लेषण करण्यासाठी मालकीचे मशीन लर्निंग मॉडेल वापरतो, जटिल डेटाचे साधे, रंग-कोडित इंडेक्समध्ये भाषांतर करतो, ज्यामुळे तुमचा वेळ वाचतो आणि तुमच्या कर्मचाऱ्यांवरील ताण कमी होतो।',
+                'trusted_by': 'प्रमुख आरोग्य सेवा प्रणालींद्वारे विश्वसनीय',
+                'pricing_heading': 'किंमत',
+                'pricing_text': 'रुग्णांसाठी प्रवेश <strong>नेहमी विनामूल्य</strong> असतो।',
+         
+                'contact_heading': 'संपर्क साधा',
+                'contact_text': "आम्हाला support@flowcare.com वर ईमेल करा किंवा +91 98765 43210 वर कॉल करा. आम्ही तुमच्या प्रश्नांची उत्तरे देण्यासाठी तयार आहोत।",
+                'contact_send': 'संदेश पाठवा', 'login_cta_heading': 'सुरुवात करण्यास तयार आहात?', 'login_create': 'खाते तयार करा / क्लिनिक नोंदणी करा', 'login_signin': 'आधीच वापरकर्ता आहात? साइन इन करा',
+                'nav_about': 'आमच्याबद्दल', 'nav_howitworks': 'ते कसे कार्य करते', 'nav_pricing': 'किंमत', 'nav_contact': 'संपर्क', 'nav_signup': 'साइन अप करा',
+                'reg_title': 'नवीन वापरकर्ता/प्रदाता नोंदणी', 'reg_account_type': 'खाते प्रकार', 'reg_option_patient': 'रुग्ण खाते', 'reg_option_provider': 'आरोग्य सेवा प्रदाता/दवाखाना', 'reg_email_label': 'ईमेल ॲड्रेस', 'reg_password_label': 'पासवर्ड', 'reg_phone_label': 'मोबाइल नंबर', 'reg_button': 'खाते नोंदणी करा', 'login_signin_text': 'साइन इन करा',
+                'login_patient_title': 'रुग्ण लॉगिन', 'login_button': 'साइन इन करा', 
+                'login_button_otp': 'ओटीपी पाठवा', 'login_forgot_password': 'पासवर्ड विसरला?', 'login_new_patient': 'नवीन रुग्ण?', 'login_signup_here': 'येथे साइन अप करा', 'login_provider_title': 'प्रदाता लॉगिन', 'login_provider_id': 'क्लिनिक आयडी / ईमेल', 'login_button_provider': 'लॉग इन करा', 'login_new_provider': 'नवीन प्रदाता?', 'login_register_clinic': 'क्लिनिक नोंदणी करा', 'login_choice_title': 'म्हणून साइन इन करा...',
+                'dashboard_find_clinics': 'डॅशबोर्ड (क्लिनिक शोधा)', 'dashboard_my_appointments': 'माझ्या अपॉइंटमेंट्स', 'dashboard_logout': 'लॉगआउट', 'find_clinics_heading': 'क्लिनिक शोधा: रिअल-टाइम ट्रॅफिक', 'next_appt_heading': 'तुमची पुढील अपॉइंटमेंट', 'confirmed': 'पुष्टी केली',
+                'search_filter_heading': 'शोधा आणि फिल्टर करा', 'specialty_all': 'सर्व विशेष शाखा', 'dashboard_my_appointments_heading': 'माझ्या अपॉइंटमेंट्सचा इतिहास', 'upcoming': 'आगामी', 'completed': 'पूर्ण झाले', 'appt_cancel': 'रद्द करा', 'appt_view_details': 'तपशील पहा', 'appt_view_summary': 'सारांश पहा', 'new_appt_cta': 'नवीन अपॉइंटमेंट हवी आहे?', 'find_clinic_now': 'आता क्लिनिक शोधा',
+                'dashboard_queue': 'डॅशबोर्ड (रांग)', 'dashboard_analytics': 'विश्लेषण', 'provider_dashboard_heading': 'प्रदाता डॅशबोर्ड: क्लिनिक प्रवाह व्यवस्थापन', 'queue_status_heading': 'रिअल-टाइम क्लिनिक स्थिती: आपत्कालीन काळजी विभाग', 'queue_traffic_level': 'वर्तमान ट्रॅफिक स्तर', 'queue_wait_time': 'प्रतीक्षा वेळ (अंदाजित)', 'queue_patients_waiting': 'प्रतीक्षेत असलेले रुग्ण', 'queue_active_heading': 'सक्रिय रुग्ण रांग', 'queue_checkin_time': 'चेक-इन:', 'queue_waiting': 'प्रतीक्षा करत आहे', 'queue_move_room': 'हलवा', 'queue_in_room': 'रूममध्ये', 'queue_mark_complete': 'पूर्ण',
+               
+                'analytics_heading': 'प्रवाह विश्लेषण आणि कामगिरी', 'analytics_chart_heading': 'सरासरी দৈনিক प्रतीक्षा वेळ (मागील 30 दिवस)', 'analytics_avg_wait_time': 'सरासरी प्रतीक्षा वेळ', 'analytics_appts_booked': 'बुक केलेल्या अपॉइंटमेंट्स', 'analytics_peak_hour': 'पीक तास (सरासरी)', 'analytics_flow_score': 'प्रवाह स्कोर सुधारणा',
+                'modal_lang_select_heading': 'भाषा निवडा', 'modal_lang_select_text': 'या वेबसाइटसाठी तुमची पसंतीची भाषा निवडा.', 'modal_continue_en': 'इंग्रजीमध्ये सुरू ठेवा', 'modal_booking_title': 'अपॉइंटमेंट बुक करा', 'booking_select_slot': 'एक उपलब्ध स्लॉट निवडा:', 'modal_confirm_appt': 'अपॉइंटमेंटची पुष्टी करा', 'booking_optional_note': 'क्लिनिकसाठी पर्यायी टीप (उदा. भेटीचे कारण)',
+                'language_set': 'भाषा मराठी वर सेट आहे।', 'default_lang_code': 'mr', 'book_appointment': 'अपॉइंटमेंट बुक करा', 'add_patient_btn': 'रुग्णाला रांगेत जोडा', 'add_patient_name': 'रुग्णाचे नाव', 'add_patient_phone': 'संपर्क क्रमांक', 'add_patient_reason': 'भेटीचे कारण'
+            }
+        };
+        const mockClinics = [
+            { id: 1, name: "Sahyadri Super Speciality Hospital", specialty: "General Practice", address: "Deccan Gymkhana, Pune", distance: "1.5 km", rating: 4.8, traffic: "LOW", waitTime: "< 10 mins" },
+            { id: 2, name: "Jehangir Hospital", specialty: "Urgent Care", address: "Sasoon Road, Pune", distance: "3.2 km", rating: 4.7, traffic: "MODERATE", waitTime: "20 - 30 mins" },
+            { id: 3, name: "KEM Hospital", specialty: "Pediatrics", address: "Rasta Peth, Pune", distance: "4.0 km", rating: 4.5, traffic: "HIGH", waitTime: "> 45 mins" },
+            { id: 4, name: "Deenanath Mangeshkar Hospital", specialty: "Dermatology", address: "Erandwane, Pune", distance: "2.5 km", rating: 4.9, traffic: "LOW", waitTime: "< 15 mins" },
+            { id: 5, name: "Ruby Hall Clinic", specialty: "General Practice", address: "Dhole Patil Road, Pune", distance: "5.1 km", rating: 4.6, traffic: "LOW", waitTime: "< 10 mins" },
+            { id: 6, "name": "Aditya Birla Memorial Hospital", "specialty": "Cardiology", "address": "Chinchwad, Pune", "distance": "15.0 km", "rating": 4.8, "traffic": "MODERATE", "waitTime": "15 - 25 mins" }
+        ];
+        let userAppointments = [
+            { id: 1, clinicId: 1, clinicName: 'Sahyadri Super Speciality Hospital', doctor: 'Dr. Priya Sharma', specialty: 'General Practice', date: 'Tuesday, Oct 15th', time: '10:30 AM', status: 'upcoming', note: ''},
+            { id: 2, clinicId: 2, clinicName: 'Jehangir Hospital', doctor: 'Dr. Rohan Joshi', specialty: 'Urgent Care', date: 'Monday, Sep 2nd', time: '3:00 PM', status: 'completed', note: 'Follow-up visit'}
+        ];
+        const providerData = {
+            clinicId: 2, // Jehangir Hospital
+            queue: [
+                {id: 1, name: 'Aarohi Patil', checkIn: '8:45 AM', status: 'waiting', reason: 'Follow-up'},
+                {id: 2, name: 'Rohan Deshmukh', checkIn: '9:02 AM', status: 'in_room', reason: 'New Patient Consultation'}
+            
+            ]
+        };
+        
+        // --- CORE APP LOGIC ---
+        
+        function setView(viewId) {
+            const views = ['view-landing', 'view-patient-login', 'view-provider-login', 'view-patient-dashboard', 'view-provider-dashboard', 'view-registration', 'view-login-choice'];
+            views.forEach(id => document.getElementById(id)?.classList.add('hidden'));
+            
+            const nextView = document.getElementById(`view-${viewId}`);
+            if (nextView) {
+                const displayClass = (viewId.includes('dashboard') || viewId.includes('login') || viewId.includes('registration') || viewId.includes('choice')) ? 'flex' : 'block';
+                nextView.classList.remove('hidden');
+                nextView.classList.add(displayClass);
+            }
+
+            const titleElement = document.getElementById('page-title');
+            switch(viewId) {
+                case 'patient-dashboard': 
+                    titleElement.textContent = 'FlowCare | Patient Dashboard'; 
+                    setPatientSubView('find-clinics');
+                    renderPatientDashboard();
+                    break;
+                case 'provider-dashboard': 
+                    titleElement.textContent = 'FlowCare | Provider Dashboard'; 
+                    setProviderSubView('queue');
+                    renderProviderDashboard();
+                    break;
+                case 'registration': titleElement.textContent = 'FlowCare | Register'; break;
+                case 'patient-login': titleElement.textContent = 'FlowCare | Patient Login'; break;
+                case 'provider-login': titleElement.textContent = 'FlowCare | Provider Login'; break;
+                case 'login-choice': titleElement.textContent = 'FlowCare | Sign In';
+                    break;
+                default: titleElement.textContent = 'FlowCare - Live Application';
+            }
+            window.scrollTo(0, 0);
+        }
+
+        function showMockMessage(message, callback = null) {
+            const existingModal = document.getElementById('message-modal');
+            if (existingModal) existingModal.remove();
+            const modalHtml = `
+                <div id="message-modal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center p-4 z-[100]">
+                    <div class="bg-white p-6 rounded-xl shadow-2xl w-full max-w-sm text-center">
+                        <h3 class="text-xl font-bold text-gray-800 mb-4">Notification</h3>
+             
+                        <p class="text-gray-600 mb-6">${message}</p>
+                        <button id="message-modal-close" class="px-6 py-2 text-white flowcare-primary rounded-lg font-semibold hover:bg-opacity-90 transition">OK</button>
+                    </div>
+                </div>`;
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            const modal = document.getElementById('message-modal');
+            const closeButton = document.getElementById('message-modal-close');
+            const closeModal = () => {
+                modal.remove();
+                if (callback) callback();
+            };
+            closeButton.onclick = closeModal;
+            modal.onclick = (e) => { if (e.target.id === 'message-modal') closeModal(); };
+        }
+
+        // --- LANGUAGE FUNCTIONS ---
+        function applyLanguage(langCode = 'en') {
+            const translation = MOCK_TRANSLATIONS[langCode] || MOCK_TRANSLATIONS['en'];
+            document.documentElement.lang = translation.default_lang_code;
+            
+            document.querySelectorAll('[data-translate]').forEach(element => {
+                const key = element.getAttribute('data-translate');
+                if (key && translation[key]) {
+                    element.innerHTML = translation[key];
+                }
+            });
+            const dynamicElements = {
+                'main-landing-heading': 'main_heading', 'landing-tagline': 'landing_tagline', 
+                'card-patient-heading': 'card_patient_heading', 'card-patient-text': 'card_patient_text', 
+                'card-provider-heading': 'card_provider_heading', 'card-provider-text': 'card_provider_text', 
+                'guide-heading': 'guide_heading', 'guide-text': 'guide_text', 
+                'process-heading': 'process_heading', 'mission-heading': 'mission_heading', 
+                'mission-text': 'mission_text', 'pricing-heading': 'pricing_heading', 
+                'pricing-text': 'pricing_text', 'contact-heading': 'contact_heading', 
+                'contact-text': 'contact_text', 'login-cta-heading': 'login_cta_heading'
+            };
+            Object.keys(dynamicElements).forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.innerHTML = translation[dynamicElements[id]];
+            });
+        }
+
+        function setLanguage(langCode) {
+            localStorage.setItem('flowcare_lang', langCode);
+            applyLanguage(langCode);
+            showMockMessage(MOCK_TRANSLATIONS[langCode].language_set);
+            document.getElementById('language-modal').classList.add('hidden');
+        }
+
+        // --- PATIENT DASHBOARD FUNCTIONS ---
+        function renderPatientDashboard() {
+            renderNextAppointment();
+            renderAppointmentHistory();
+            filterClinics();
+        }
+
+        function renderNextAppointment() {
+            const nextApptContainer = document.getElementById('patient-next-appointment');
+            const nextAppointment = userAppointments.find(a => a.status === 'upcoming');
+            if (nextAppointment) {
+                 nextApptContainer.innerHTML = `
+                    <h2 class="text-xl font-semibold text-gray-700 mb-3" data-translate="next_appt_heading">Your Next Appointment</h2>
+                    <div class="flex items-center justify-between">
+                     
+                        <div class="text-gray-600">
+                            <p class="text-lg font-medium">${nextAppointment.doctor} - ${nextAppointment.specialty}</p>
+                            <p>${nextAppointment.date} at ${nextAppointment.time}</p>
+                        </div>
+          
+                        <span class="px-4 py-1 text-sm font-semibold flowcare-primary-text flowcare-primary-light rounded-full" data-translate="confirmed">Confirmed</span>
+                    </div>
+                `;
+            } else {
+                 nextApptContainer.innerHTML = `<p class="text-center text-gray-500" data-translate="no_upcoming_appointments">You have no upcoming appointments.</p>`;
+            }
+            applyLanguage(localStorage.getItem('flowcare_lang') || 'en');
+        }
+
+        function renderAppointmentHistory() {
+            const historyList = document.getElementById('appointment-history-list');
+            historyList.innerHTML = '';
+            if (userAppointments.length === 0) {
+                 historyList.innerHTML = `<p class="text-center text-gray-500" data-translate="no_appointments">No appointments found.</p>`;
+            } else {
+                userAppointments.slice().reverse().forEach(appt => {
+                    const isUpcoming = appt.status === 'upcoming';
+                    historyList.innerHTML += `
+                        <div class="bg-white p-5 rounded-xl shadow-lg border-l-4 ${isUpcoming ? 'border-[#00A389]' : 'border-gray-400'}">
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    
+                                    <p class="text-xl font-semibold text-gray-800">${appt.date}, ${appt.time}</p>
+                                    <p class="text-gray-600">${appt.doctor} - ${appt.clinicName}</p>
+                                </div>
+                         
+                                <span class="px-3 py-1 text-sm font-semibold ${isUpcoming ? 'flowcare-primary-text flowcare-primary-light' : 'text-gray-600 bg-gray-200'} rounded-full" data-translate="${appt.status}">${appt.status}</span>
+                            </div>
+                            <div class="mt-3 text-right">
+                      
+                                ${isUpcoming ?
+                                `<button class="text-sm text-red-500 hover:text-red-700 mr-4 cancel-appointment-btn" data-id="${appt.id}" data-translate="appt_cancel">Cancel</button>` : ''}
+                                <button class="text-sm text-gray-500 hover:text-gray-700" data-translate="${isUpcoming ? 'appt_view_details' : 'appt_view_summary'}">${isUpcoming ? 'View Details' : 'View Summary'}</button>
+                            </div>
+                        </div>
+                    `;
+                });
+            }
+            historyList.innerHTML += `
+                    <div class="text-center pt-4">
+                    <p class="text-gray-500" data-translate="new_appt_cta">Need a new appointment?</p>
+                    <button class="px-4 py-2 mt-2 text-white font-semibold flowcare-primary rounded-lg hover:bg-opacity-90 transition find-clinic-now-btn" data-translate="find_clinic_now">
+       
+                        Find a Clinic Now
+                    </button>
+                </div>`;
+            applyLanguage(localStorage.getItem('flowcare_lang') || 'en');
+        }
+
+        function filterClinics() {
+            const searchTerm = document.getElementById('clinic-search').value.toLowerCase();
+            const selectedSpecialty = document.getElementById('specialty-filter').value;
+            const filteredList = mockClinics.filter(clinic => 
+                (searchTerm === '' || clinic.name.toLowerCase().includes(searchTerm) || clinic.address.toLowerCase().includes(searchTerm)) &&
+                (selectedSpecialty === 'All' || clinic.specialty === selectedSpecialty)
+            );
+            renderClinicCards(filteredList);
+        }
+
+        function renderClinicCards(clinicsToRender) {
+            const list = document.getElementById('clinic-list');
+            list.innerHTML = ''; 
+            if (clinicsToRender.length === 0) {
+                list.innerHTML = '<p class="text-center text-gray-500 p-8 bg-white rounded-xl shadow-md">No clinics found matching your criteria.</p>';
+                return;
+            }
+            clinicsToRender.forEach(clinic => {
+                const badge = `<span class="px-3 py-1 text-sm font-bold text-white rounded-full traffic-${clinic.traffic.toLowerCase()}-bg">${clinic.traffic}</span>`;
+                const waitTimeColor = `traffic-${clinic.traffic.toLowerCase()}-text`;
+                list.innerHTML += `
+                    <div class="bg-white p-5 rounded-xl shadow-lg flex flex-col md:flex-row justify-between items-start md:items-center hover:shadow-xl transition duration-300">
+                        <div class="mb-4 md:mb-0">
+                            <h3 class="text-xl font-bold text-gray-800">${clinic.name} <span class="text-sm font-normal text-gray-500 ml-2">(${clinic.specialty})</span></h3>
+                           
+                            <p class="text-gray-500 text-sm">${clinic.address} • ${clinic.distance}</p>
+                        </div>
+                        <div class="flex items-center gap-6 mb-4 md:mb-0">
+                            <div class="text-center">${badge}<p class="text-xs text-gray-500 mt-1">Current Traffic</p></div>
+         
+                            <div class="text-center"><p class="text-lg font-bold ${waitTimeColor}">${clinic.waitTime}</p><p class="text-xs text-gray-500">Wait Estimate</p></div>
+                        </div>
+                        <button class="w-full md:w-auto px-6 py-2 text-white font-semibold flowcare-primary rounded-lg hover:bg-opacity-90 transition book-appointment-btn" data-clinic-id="${clinic.id}" data-translate="book_appointment">Book Appointment</button>
+            
+                    </div>
+                `;
+            });
+            applyLanguage(localStorage.getItem('flowcare_lang') || 'en');
+        }
+
+        function openBookingModal(clinicId) {
+            const clinic = mockClinics.find(c => c.id == clinicId);
+            const modal = document.getElementById('booking-modal');
+            const modalTitle = modal.querySelector('#modal-clinic-name');
+            
+            document.getElementById('confirm-booking-btn').dataset.clinicId = clinicId;
+
+            modalTitle.textContent = `Book Appointment: ${clinic.name}`;
+
+            const slotsContainer = modal.querySelector('#booking-slots-container');
+            slotsContainer.innerHTML = `
+                <label class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <input type="radio" name="slot" value="Today, 10:30 AM" class="mr-3 text-[#00A389]" checked>
+                    <span class="font-semibold">Today, 10:30 AM</span> 
+                    <span class="text-sm traffic-low-text ml-2">(LOW Traffic - Est. wait 5 mins)</span>
+                </label>
+                 <label class="block p-3 border border-gray-200 rounded-lg hover:bg-gray-50 cursor-pointer">
+                    <input type="radio" name="slot" value="Today, 2:00 PM" class="mr-3 text-[#00A389]">
+                    <span class="font-semibold">Today, 2:00 PM</span> 
+   
+                    <span class="text-sm traffic-moderate-text ml-2">(MODERATE Traffic - Est. wait 20 mins)</span>
+                </label>
+            `;
+            modal.classList.remove('hidden');
+            applyLanguage(localStorage.getItem('flowcare_lang') || 'en');
+        }
+        
+        // --- PROVIDER DASHBOARD FUNCTIONS ---
+        function renderProviderDashboard() {
+            const clinic = mockClinics.find(c => c.id === providerData.clinicId);
+            document.getElementById('provider-dashboard-heading').textContent = `${clinic.name}: Flow Management`;
+            
+            // Sync hidden select and custom dropdown
+            const hiddenSelect = document.getElementById('traffic-level-select');
+            hiddenSelect.value = clinic.traffic;
+            updateCustomDropdown(clinic.traffic);
+            
+            document.getElementById('provider-wait-time-input').value = clinic.waitTime;
+            document.getElementById('provider-patients-waiting').textContent = providerData.queue.length;
+
+            renderProviderQueue();
+        }
+
+        function renderProviderQueue() {
+            const queueList = document.getElementById('provider-queue-list');
+            queueList.innerHTML = '';
+            if (providerData.queue.length === 0) {
+                queueList.innerHTML = `<p class="text-center text-gray-500 py-4">The queue is currently empty.</p>`;
+                applyLanguage(localStorage.getItem('flowcare_lang') || 'en');
+                return;
+            }
+            providerData.queue.forEach(patient => {
+                const inRoom = patient.status === 'in_room';
+                queueList.innerHTML += `
+                     <div class="grid grid-cols-5 gap-2 items-center p-3 border-b">
+                
+                        <div class="col-span-2">
+                             <div class="font-medium text-gray-800">${patient.name}</div>
+                             <div class="text-xs text-gray-500">${patient.reason || 'N/A'}</div>
+                        </div>
+   
+                        <div class="text-sm text-gray-500 text-center">${patient.checkIn}</div>
+                        <div class="text-center">
+                            <span class="px-3 py-1 text-xs font-semibold ${inRoom ? 'text-green-800 bg-green-100' : 'text-blue-800 bg-blue-100'} rounded-full" data-translate="queue_${patient.status}">${inRoom ? 'In Room' : 'Waiting'}</span>
+     
+                        </div>
+                        <div class="text-right">
+                            <button class="px-3 py-1 text-xs text-white ${inRoom ? 'traffic-low-bg' : 'flowcare-accent'} rounded hover:opacity-90 queue-action-btn" data-patient-id="${patient.id}" data-action="${inRoom ? 'complete' : 'move'}">${inRoom ? 'Complete' : 'Move'}</button>
+                        </div>
+                    </div>
+                `;
+            });
+            applyLanguage(localStorage.getItem('flowcare_lang') || 'en');
+        }
+
+        // --- EVENT LISTENERS ---
+        document.addEventListener('DOMContentLoaded', () => {
+            const safeAddEventListener = (id, event, handler) => {
+                const element = document.getElementById(id);
+                if (element) element.addEventListener(event, handler);
+           
+            };
+
+            const storedLang = localStorage.getItem('flowcare_lang');
+            if (storedLang) {
+                applyLanguage(storedLang);
+            } else {
+                document.getElementById('language-modal').classList.remove('hidden');
+                applyLanguage('en');
+        
+            }
+            setView('landing');
+
+            // --- Navigation & Modals ---
+            safeAddEventListener('language-btn', 'click', () => document.getElementById('language-modal').classList.remove('hidden'));
+            safeAddEventListener('close-language-modal-btn', 'click', () => document.getElementById('language-modal').classList.add('hidden'));
+            document.querySelectorAll('.lang-select-btn').forEach(btn => btn.addEventListener('click', (e) => setLanguage(e.currentTarget.dataset.lang)));
+            
+            safeAddEventListener('landing-signup-btn', 'click', () => setView('registration'));
+            safeAddEventListener('cta-register-btn', 'click', () => setView('registration'));
+            safeAddEventListener('cta-signin-btn', 'click', () => setView('login-choice'));
+            safeAddEventListener('reg-signin-link', 'click', (e) => { e.preventDefault(); setView('login-choice'); });
+            safeAddEventListener('plogin-signup-link', 'click', (e) => { e.preventDefault(); setView('registration'); });
+            safeAddEventListener('prlogin-signup-link', 'click', (e) => { e.preventDefault(); setView('registration'); });
+            safeAddEventListener('choice-patient-btn', 'click', () => setView('patient-login'));
+            safeAddEventListener('choice-provider-btn', 'click', () => setView('provider-login'));
+            
+            document.querySelectorAll('.close-view-btn').forEach(btn => btn.addEventListener('click', () => setView('landing')));
+            safeAddEventListener('patient-logout-btn', 'click', (e) => { e.preventDefault(); setView('landing'); });
+            safeAddEventListener('provider-logout-btn', 'click', (e) => { e.preventDefault(); setView('landing'); });
+            document.querySelectorAll('.nav-patient-dashboard').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); setPatientSubView(e.currentTarget.dataset.target); }));
+            document.querySelectorAll('.nav-provider-dashboard').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); setProviderSubView(e.currentTarget.dataset.target); }));
+
+            // --- Forms ---
+            safeAddEventListener('contact-send-btn', 'click', () => {
+                const email = document.getElementById('contact-email').value;
+                if(email && email.includes('@')) {
+                    showMockMessage(`Thank you! Your message from ${email} has been received.`);
+               
+                    document.getElementById('contact-email').value = '';
+                } else {
+                    showMockMessage('Please enter a valid email address.');
+                }
+            });
+            safeAddEventListener('registration-form', 'submit', (e) => {
+                e.preventDefault();
+                const type = document.getElementById('reg_type').value;
+                const identifier = type === 'patient' ? document.getElementById('reg_phone').value : document.getElementById('reg_email').value;
+                
+                if (document.getElementById('registration-form').checkValidity()) {
+  
+                    showMockMessage(`SUCCESS! Mock registration for ${type} account with ${identifier} complete. Welcome!`, () => {
+                        setView(type === 'patient' ? 'patient-dashboard' : 'provider-dashboard');
+                    });
+                } else {
+ 
+                    showMockMessage('Please fill in all required details correctly.');
+                }
+            });
+            safeAddEventListener('reg_type', 'change', (e) => {
+                const isPatient = e.target.value === 'patient';
+                document.getElementById('reg-otp-section').classList.toggle('hidden', !isPatient);
+                document.getElementById('reg-provider-section').classList.toggle('hidden', isPatient);
+                
+                const phoneInput = document.getElementById('reg_phone');
+      
+                const emailInput = document.getElementById('reg_email');
+                const passwordInput = document.getElementById('reg_password');
+
+                phoneInput.required = isPatient;
+                emailInput.required = !isPatient;
+                passwordInput.required = !isPatient;
+            });
+            safeAddEventListener('patient-login-form', 'submit', (e) => { e.preventDefault(); setView('patient-dashboard'); });
+            safeAddEventListener('provider-login-form', 'submit', (e) => { e.preventDefault(); setView('provider-dashboard'); });
+            
+            // --- Patient Dashboard ---
+            safeAddEventListener('clinic-search', 'input', filterClinics);
+            safeAddEventListener('specialty-filter', 'change', filterClinics);
+
+            document.body.addEventListener('click', e => {
+                if (e.target.closest('.book-appointment-btn')) {
+                    const clinicId = e.target.closest('.book-appointment-btn').dataset.clinicId;
+                    openBookingModal(clinicId);
+                }
+                if(e.target.closest('.find-clinic-now-btn')) {
+                    setPatientSubView('find-clinics');
+                }
+                if (e.target.closest('.cancel-appointment-btn')) {
+                    const apptId = e.target.closest('.cancel-appointment-btn').dataset.id;
+                    userAppointments = userAppointments.filter(a => a.id != apptId);
+                    showMockMessage("Appointment successfully cancelled.");
+                    renderPatientDashboard();
+                }
+            });
+            safeAddEventListener('close-booking-modal-btn', 'click', () => document.getElementById('booking-modal').classList.add('hidden'));
+            safeAddEventListener('booking-modal', 'click', (e) => { if(e.target.id === 'booking-modal') document.getElementById('booking-modal').classList.add('hidden'); });
+            
+            safeAddEventListener('confirm-booking-btn', 'click', (e) => {
+                const clinicId = e.currentTarget.dataset.clinicId;
+                const clinic = mockClinics.find(c => c.id == clinicId);
+                const selectedSlotInput = document.querySelector('input[name="slot"]:checked');
+                const bookingNote = document.getElementById('booking-note').value.trim();
+                
+                if (!selectedSlotInput) {
+                    showMockMessage("Please select a time slot to book.");
+                    return;
+                }
+                const [date, time] = selectedSlotInput.value.split(', ');
+                
+                const newAppointment = { 
+                    id: Date.now(), 
+                    clinicId: clinic.id, 
+                    clinicName: clinic.name, 
+                    doctor: 'Dr. A. Kumar', 
+                    specialty: clinic.specialty, 
+                    date, 
+                    time, 
+                    status: 'upcoming',
+                    note: bookingNote // Save the note
+                };
+                userAppointments.push(newAppointment);
+
+                document.getElementById('booking-note').value = ''; // Clear the note field
+                document.getElementById('booking-modal').classList.add('hidden');
+                showMockMessage("Appointment successfully requested!", () => {
+                    renderPatientDashboard();
+                    setPatientSubView('my-appointments');
+                });
+            });
+
+            // --- Provider Dashboard & Custom Dropdown ---
+            const dropdownButton = document.getElementById('custom-dropdown-button');
+            const dropdownOptions = document.getElementById('custom-dropdown-options');
+
+            dropdownButton.addEventListener('click', () => {
+                const isHidden = dropdownOptions.classList.contains('hidden');
+                if (isHidden) {
+                    dropdownOptions.classList.remove('hidden');
+                    setTimeout(() => {
+              
+                        dropdownOptions.classList.remove('opacity-0', 'scale-95');
+                        dropdownOptions.classList.add('opacity-100', 'scale-100');
+                    }, 10);
+                } else {
+                    dropdownOptions.classList.remove('opacity-100', 'scale-100');
+    
+                    dropdownOptions.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => dropdownOptions.classList.add('hidden'), 200);
+                }
+            });
+            document.querySelectorAll('.custom-dropdown-item').forEach(item => {
+                item.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const value = e.currentTarget.dataset.value;
+                    updateAndSyncTrafficLevel(value);
+                
+     
+                    dropdownOptions.classList.remove('opacity-100', 'scale-100');
+                    dropdownOptions.classList.add('opacity-0', 'scale-95');
+                    setTimeout(() => dropdownOptions.classList.add('hidden'), 200);
+                });
+            });
+            // Close dropdown if clicked outside
+             window.addEventListener('click', (e) => {
+                if (!document.getElementById('custom-dropdown-container').contains(e.target)) {
+                    dropdownOptions.classList.remove('opacity-100', 'scale-100');
+                    dropdownOptions.classList.add('opacity-0', 'scale-95');
+                   
+                    setTimeout(() => dropdownOptions.classList.add('hidden'), 200);
+                }
+            });
+            safeAddEventListener('provider-wait-time-input', 'change', (e) => {
+                const newWaitTime = e.target.value;
+                const clinic = mockClinics.find(c => c.id === providerData.clinicId);
+                if (clinic) {
+                    clinic.waitTime = newWaitTime;
+              
+                    showMockMessage(`Wait time for ${clinic.name} manually updated to ${newWaitTime}.`);
+                }
+            });
+            safeAddEventListener('provider-queue-list', 'click', (e) => {
+                if(e.target.closest('.queue-action-btn')) {
+                    const btn = e.target.closest('.queue-action-btn');
+                    const patientId = btn.dataset.patientId;
+                    const action = btn.dataset.action;
+          
+                    const patient = providerData.queue.find(p => p.id == patientId);
+                    
+                    if(action === 'move') {
+                        patient.status = 'in_room';
+              
+                        showMockMessage(`${patient.name} has been moved to a room.`);
+                    } else {
+                        providerData.queue = providerData.queue.filter(p => p.id != patientId);
+                        showMockMessage(`${patient.name}'s checkout is complete.`);
+     
+                    }
+                    renderProviderDashboard();
+                }
+            });
+            safeAddEventListener('add-patient-btn', 'click', () => {
+                const nameInput = document.getElementById('new-patient-name');
+                const phoneInput = document.getElementById('new-patient-phone');
+                const reasonInput = document.getElementById('new-patient-reason');
+                
+                const patientName = nameInput.value.trim();
+    
+                if (patientName) {
+                    const newPatient = {
+                        id: Date.now(),
+                        name: patientName,
+             
+                        phone: phoneInput.value.trim(),
+                        reason: reasonInput.value.trim() || 'General Check-up',
+                        checkIn: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit'}),
+                        status: 'waiting'
+    
+                    };
+                    providerData.queue.push(newPatient);
+                    renderProviderDashboard();
+                    nameInput.value = '';
+                    phoneInput.value = '';
+                    reasonInput.value = '';
+                    showMockMessage(`${patientName} has been added to the queue.`);
+                } else {
+                    showMockMessage('Please enter a patient name.');
+                }
+            });
+
+            // --- CHATBOT LOGIC ---
+            const chatbotWidget = document.getElementById('chatbot-widget');
+            const chatbotHeader = document.getElementById('chatbot-header');
+            const chatbotOpenBtn = document.getElementById('chatbot-open-btn');
+            const closeChatbotBtn = document.getElementById('chatbot-close-btn');
+            const sendChatbotBtn = document.getElementById('chatbot-send-btn');
+            const chatbotInput = document.getElementById('chatbot-input');
+            const chatbotBody = document.getElementById('chatbot-body');
+
+            let isDragging = false;
+            let offsetX, offsetY;
+
+            // Drag functionality
+            chatbotHeader.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                
+                // Convert fixed positioning to absolute based on current location
+                const rect = chatbotWidget.getBoundingClientRect();
+                chatbotWidget.style.top = `${rect.top}px`;
+                chatbotWidget.style.left = `${rect.left}px`;
+                chatbotWidget.style.bottom = 'auto';
+                chatbotWidget.style.right = 'auto';
+
+                offsetX = e.clientX - rect.left;
+                offsetY = e.clientY - rect.top;
+                
+                document.body.style.cursor = 'grabbing';
+                chatbotWidget.style.transition = 'none';
+            });
+
+            document.addEventListener('mousemove', (e) => {
+                if (isDragging) {
+                    let newX = e.clientX - offsetX;
+                    let newY = e.clientY - offsetY;
+
+                    const maxX = window.innerWidth - chatbotWidget.offsetWidth;
+                    const maxY = window.innerHeight - chatbotWidget.offsetHeight;
+
+                    newX = Math.max(0, Math.min(newX, maxX));
+                    newY = Math.max(0, Math.min(newY, maxY));
+
+                    chatbotWidget.style.left = `${newX}px`;
+                    chatbotWidget.style.top = `${newY}px`;
+                }
+            });
+
+            document.addEventListener('mouseup', () => {
+                if (isDragging) {
+                    isDragging = false;
+                    document.body.style.cursor = 'default';
+                    chatbotWidget.style.transition = 'transform 0.3s ease';
+                }
+            });
+            
+            // Toggle visibility with open/close buttons
+            chatbotOpenBtn.addEventListener('click', () => {
+                chatbotWidget.classList.remove('hidden');
+                chatbotOpenBtn.classList.add('hidden');
+            });
+
+            closeChatbotBtn.addEventListener('click', () => {
+                chatbotWidget.classList.add('hidden');
+                chatbotOpenBtn.classList.remove('hidden');
+            });
+
+            // Send message functionality
+            const handleSend = () => {
+                const userMessage = chatbotInput.value.trim();
+                if (userMessage) {
+                    chatbotBody.innerHTML += `
+                        <div class="flex justify-end mt-2">
+                            <div class="p-2 bg-blue-500 text-white rounded-lg text-sm max-w-[80%]">
+                                ${userMessage}
+                            </div>
+                        </div>`;
+                    chatbotInput.value = '';
+                    chatbotBody.scrollTop = chatbotBody.scrollHeight;
+
+                    setTimeout(() => {
+                        chatbotBody.innerHTML += `
+                            <div class="flex mt-2">
+                                <div class="p-2 bg-gray-200 rounded-lg text-sm text-gray-800 max-w-[80%]">
+                                    I am a demo assistant. I can't process requests yet, but this feature is movable!
+                                </div>
+                            </div>`;
+                        chatbotBody.scrollTop = chatbotBody.scrollHeight;
+                    }, 1000);
+                }
+            };
+            sendChatbotBtn.addEventListener('click', handleSend);
+            chatbotInput.addEventListener('keypress', (e) => {
+                if(e.key === 'Enter') handleSend();
+            });
+        });
+        
+        // --- VIEW MANAGEMENT & UTILITIES ---
+        function setPatientSubView(subViewId) {
+            document.querySelectorAll('#patient-content-container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`subview-${subViewId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-patient-dashboard').forEach(link => {
+                link.classList.remove('sidebar-active-patient');
+                if (link.dataset.target === subViewId) {
+                    link.classList.add('sidebar-active-patient');
+                }
+            });
+        }
+
+        function setProviderSubView(subViewId) {
+            document.querySelectorAll('#provider-content-container > div').forEach(div => div.classList.add('hidden'));
+            document.getElementById(`subview-${subViewId}`).classList.remove('hidden');
+            
+            document.querySelectorAll('.nav-provider-dashboard').forEach(link => {
+                link.classList.remove('sidebar-active-provider');
+                if (link.dataset.target === subViewId) {
+                     link.classList.add('sidebar-active-provider');
+                }
+            });
+            if (subViewId === 'analytics') renderAnalyticsChart();
+        }
+
+        function updateCustomDropdown(value) {
+            const button = document.getElementById('custom-dropdown-button');
+            const valueSpan = document.getElementById('custom-dropdown-value');
+            
+            valueSpan.textContent = value;
+            button.className = button.className.replace(/traffic-(low|moderate|high)-bg/g, '');
+            button.classList.add(`traffic-${value.toLowerCase()}-bg`);
+        }
+        
+        function updateAndSyncTrafficLevel(newStatus) {
+            const clinic = mockClinics.find(c => c.id === providerData.clinicId);
+            clinic.traffic = newStatus;
+
+            switch(newStatus) {
+                case 'LOW': clinic.waitTime = "< 15 mins"; break;
+                case 'MODERATE': clinic.waitTime = "20 - 30 mins"; break;
+                case 'HIGH': clinic.waitTime = "> 45 mins"; break;
+            }
+            renderProviderDashboard();
+            showMockMessage(`Clinic traffic status updated to ${newStatus}. Wait time auto-adjusted.`);
+        }
+
+        // --- 3D Analytics Chart ---
+        let scene, camera, renderer, chartInitialized = false;
+        function renderAnalyticsChart() {
+            if (chartInitialized) return;
+            chartInitialized = true;
+            const container = document.getElementById('analytics-chart-container');
+            const canvas = document.getElementById('analytics-chart-canvas');
+            document.getElementById('canvas-placeholder').classList.add('hidden');
+            
+            scene = new THREE.Scene();
+            scene.background = new THREE.Color(0xf0f0f5);
+            camera = new THREE.PerspectiveCamera(75, container.clientWidth / container.clientHeight, 0.1, 1000);
+            camera.position.set(2, 4, 8);
+            renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true, alpha: true });
+            renderer.setSize(container.clientWidth, container.clientHeight);
+            const waitTimes = [15, 25, 10, 30, 20, 18];
+            waitTimes.forEach((heightVal, index) => {
+                const color = heightVal < 15 ? 0x4CAF50 : heightVal < 25 ? 0xFFC107 : 0xF44336;
+                const geometry = new THREE.BoxGeometry(0.5, heightVal / 6, 0.5);
+                const material = new THREE.MeshLambertMaterial({ color: color });
+          
+                const bar = new THREE.Mesh(geometry, material);
+                bar.position.set(-2 + index * 0.7, bar.geometry.parameters.height / 2, 0);
+                scene.add(bar);
+            });
+            scene.add(new THREE.AmbientLight(0xcccccc, 0.8));
+            const light = new THREE.DirectionalLight(0xffffff, 1.2);
+            light.position.set(5, 10, 7.5);
+            scene.add(light);
+            function animate() {
+                requestAnimationFrame(animate);
+                scene.rotation.y += 0.005;
+                renderer.render(scene, camera);
+            }
+            animate();
+            window.addEventListener('resize', () => {
+                if(container && camera && renderer) {
+                    camera.aspect = container.clientWidth / container.clientHeight;
+                    camera.updateProjectionMatrix();
+                    renderer.setSize(container.clientWidth, container.clientHeight);
+           
+                }
+            }, false);
+        }
+    </script>
+</body>
+</html>
