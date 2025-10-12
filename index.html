@@ -1016,8 +1016,17 @@
             safeAddEventListener('choice-provider-btn', 'click', () => setView('provider-login'));
             
             document.querySelectorAll('.close-view-btn').forEach(btn => btn.addEventListener('click', () => setView('landing')));
-            safeAddEventListener('patient-logout-btn', 'click', (e) => { e.preventDefault(); setView('landing'); });
-            safeAddEventListener('provider-logout-btn', 'click', (e) => { e.preventDefault(); setView('landing'); });
+            // REPLACE with this
+            const handleLogout = (e) => {
+                e.preventDefault();
+                auth.signOut().then(() => {
+                    showMockMessage("You have been logged out.");
+                    setView('landing');
+                }).catch(error => console.error("Logout Error:", error));
+            };
+
+            safeAddEventListener('patient-logout-btn', 'click', handleLogout);
+            safeAddEventListener('provider-logout-btn', 'click', handleLogout);
             document.querySelectorAll('.nav-patient-dashboard').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); setPatientSubView(e.currentTarget.dataset.target); }));
             document.querySelectorAll('.nav-provider-dashboard').forEach(link => link.addEventListener('click', (e) => { e.preventDefault(); setProviderSubView(e.currentTarget.dataset.target); }));
 
@@ -1032,21 +1041,50 @@
                     showMockMessage('Please enter a valid email address.');
                 }
             });
+            // REPLACE with this new version
             safeAddEventListener('registration-form', 'submit', (e) => {
                 e.preventDefault();
-                const type = document.getElementById('reg_type').value;
-                const identifier = type === 'patient' ? document.getElementById('reg_phone').value : document.getElementById('reg_email').value;
-                
-                if (document.getElementById('registration-form').checkValidity()) {
-  
-                    showMockMessage(`SUCCESS! Mock registration for ${type} account with ${identifier} complete. Welcome!`, () => {
-                        setView(type === 'patient' ? 'patient-dashboard' : 'provider-dashboard');
-                    });
-                } else {
- 
-                    showMockMessage('Please fill in all required details correctly.');
+                const accountType = document.getElementById('reg_type').value;
+                const email = document.getElementById('reg_email').value;
+                const password = document.getElementById('reg_password').value;
+                const phone = document.getElementById('reg_phone').value; // We'll save this but use email/pass for login
+
+                // For this prototype, we'll use Email/Password for both patients and providers
+                // We'll hide the phone field for providers
+                if (!email || !password) {
+                    showMockMessage('Please enter both email and password to register.');
+                    return;
                 }
+
+                // --- NEW: Firebase Registration Logic ---
+                auth.createUserWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Account created
+                        const user = userCredential.user;
+                        showMockMessage(`Success! Your ${accountType} account for ${email} has been created.`, () => {
+                            // Redirect to the correct dashboard
+                            setView(accountType === 'patient' ? 'patient-dashboard' : 'provider-dashboard');
+                        });
+                    })
+                    .catch((error) => {
+                        // Handle errors
+                        console.error("Registration Error:", error);
+                        showMockMessage(error.message); // Show the specific Firebase error
+                    });
             });
+
+        // Also, modify the account type dropdown logic to show/hide the right fields
+        safeAddEventListener('reg_type', 'change', (e) => {
+            const isPatient = e.target.value === 'patient';
+            // For our prototype, we'll use Email/Password for both, so let's adjust the UI.
+            // Let's show phone for patient and email/pass for provider.
+            document.getElementById('reg-otp-section').classList.toggle('hidden', !isPatient);
+            document.getElementById('reg-provider-section').classList.toggle('hidden', isPatient);
+            
+            document.getElementById('reg_phone').required = isPatient;
+            document.getElementById('reg_email').required = !isPatient;
+            document.getElementById('reg_password').required = !isPatient;
+        });
             safeAddEventListener('reg_type', 'change', (e) => {
                 const isPatient = e.target.value === 'patient';
                 document.getElementById('reg-otp-section').classList.toggle('hidden', !isPatient);
@@ -1061,28 +1099,62 @@
                 emailInput.required = !isPatient;
                 passwordInput.required = !isPatient;
             });
-            safeAddEventListener('patient-login-form', 'submit', (e) => { e.preventDefault(); setView('patient-dashboard'); });
-            safeAddEventListener('provider-login-form', 'submit', (e) => { e.preventDefault(); setView('provider-dashboard'); });
-            
-            // --- Patient Dashboard ---
-            safeAddEventListener('clinic-search', 'input', filterClinics);
-            safeAddEventListener('specialty-filter', 'change', filterClinics);
+            // REPLACE with this
+            safeAddEventListener('patient-login-form', 'submit', (e) => {
+                e.preventDefault();
+                // For simplicity, we'll use a mock email/pass login for patients too.
+                // In a real app, this would be an OTP flow.
+                // You would need to change the HTML input type from 'tel' to 'email'.
+                const email = document.getElementById('p_phone').value; // Assuming this is now an email input
+                const mockPassword = "password123"; // In a real app, you'd have a password field
 
-            document.body.addEventListener('click', e => {
-                if (e.target.closest('.book-appointment-btn')) {
-                    const clinicId = e.target.closest('.book-appointment-btn').dataset.clinicId;
-                    openBookingModal(clinicId);
-                }
-                if(e.target.closest('.find-clinic-now-btn')) {
-                    setPatientSubView('find-clinics');
-                }
-                if (e.target.closest('.cancel-appointment-btn')) {
-                    const apptId = e.target.closest('.cancel-appointment-btn').dataset.id;
-                    userAppointments = userAppointments.filter(a => a.id != apptId);
-                    showMockMessage("Appointment successfully cancelled.");
-                    renderPatientDashboard();
-                }
+                // This is a simplified login. For a real app, add a password field.
+                auth.signInWithEmailAndPassword(email, mockPassword)
+                    .then((userCredential) => {
+                        setView('patient-dashboard');
+                    })
+                    .catch((error) => {
+                        console.error("Patient Login Error:", error);
+                        showMockMessage("Login failed. For the prototype, try registering first.");
+                    });
             });
+                // REPLACE with this
+            safeAddEventListener('provider-login-form', 'submit', (e) => {
+                e.preventDefault();
+                const email = document.getElementById('p_prov_email').value;
+                const password = document.getElementById('p_prov_password').value;
+
+                // --- NEW: Firebase Login Logic ---
+                auth.signInWithEmailAndPassword(email, password)
+                    .then((userCredential) => {
+                        // Signed in
+                        setView('provider-dashboard');
+                    })
+                    .catch((error) => {
+                        console.error("Login Error:", error);
+                        showMockMessage("Login failed. Please check your email and password.");
+                    });
+            });
+                
+                // --- Patient Dashboard ---
+                safeAddEventListener('clinic-search', 'input', filterClinics);
+                safeAddEventListener('specialty-filter', 'change', filterClinics);
+
+                document.body.addEventListener('click', e => {
+                    if (e.target.closest('.book-appointment-btn')) {
+                        const clinicId = e.target.closest('.book-appointment-btn').dataset.clinicId;
+                        openBookingModal(clinicId);
+                    }
+                    if(e.target.closest('.find-clinic-now-btn')) {
+                        setPatientSubView('find-clinics');
+                    }
+                    if (e.target.closest('.cancel-appointment-btn')) {
+                        const apptId = e.target.closest('.cancel-appointment-btn').dataset.id;
+                        userAppointments = userAppointments.filter(a => a.id != apptId);
+                        showMockMessage("Appointment successfully cancelled.");
+                        renderPatientDashboard();
+                    }
+                });
             safeAddEventListener('close-booking-modal-btn', 'click', () => document.getElementById('booking-modal').classList.add('hidden'));
             safeAddEventListener('booking-modal', 'click', (e) => { if(e.target.id === 'booking-modal') document.getElementById('booking-modal').classList.add('hidden'); });
             
