@@ -1,3 +1,7 @@
+Currently, this is basically a boilerplate for the actual site. New features will be added, and the site will turn into a real app. This was basically dropped for months, but resuming work on it.
+
+
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
