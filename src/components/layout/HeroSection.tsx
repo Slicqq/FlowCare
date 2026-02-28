@@ -10,9 +10,9 @@ export default function HeroSection() {
     return (
         <section className="relative w-full overflow-visible py-16 md:py-24">
             {/* Elegant Background Glows */}
-            <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-flowcare-primary/10 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-glow pointer-events-none"></div>
-            <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-flowcare-accent/10 rounded-full mix-blend-multiply filter blur-[100px] opacity-60 animate-glow pointer-events-none" style={{ animationDelay: '3s' }}></div>
-            <div className="absolute -bottom-32 left-1/3 w-[600px] h-[600px] bg-blue-300/10 dark:bg-blue-900/20 rounded-full mix-blend-multiply filter blur-[120px] opacity-50 animate-glow pointer-events-none" style={{ animationDelay: '5s' }}></div>
+            <div className="absolute top-10 left-1/4 w-[500px] h-[500px] bg-flowcare-primary/10 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-60 animate-glow pointer-events-none"></div>
+            <div className="absolute top-20 right-1/4 w-[400px] h-[400px] bg-flowcare-accent/10 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[100px] opacity-60 animate-glow pointer-events-none" style={{ animationDelay: '3s' }}></div>
+            <div className="absolute -bottom-32 left-1/3 w-[600px] h-[600px] bg-blue-300/10 dark:bg-flowcare-primary/20 rounded-full mix-blend-multiply dark:mix-blend-screen filter blur-[120px] opacity-50 animate-glow pointer-events-none" style={{ animationDelay: '5s' }}></div>
 
             <div className="relative text-center max-w-5xl mx-auto px-4 z-10 animate-fade-up">
                 <h1 className="text-5xl md:text-6xl lg:text-7xl font-extrabold font-heading text-gray-900 dark:text-white mb-6 leading-[1.1] pb-2 tracking-tight">

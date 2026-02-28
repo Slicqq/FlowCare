@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthContext';
-import Header from '@/components/layout/Header';
 import { useLanguage } from '@/lib/LanguageContext';
 
 export default function RegisterPage() {
@@ -44,14 +43,11 @@ export default function RegisterPage() {
     };
 
     return (
-        <div className="min-h-screen bg-transparent font-sans text-gray-900 dark:text-gray-100 selection:bg-flowcare-primary/30 selection:text-flowcare-primary-dark dark:selection:text-flowcare-primary-light relative flex flex-col">
+        <div className="min-h-screen bg-transparent font-sans text-gray-900 dark:text-gray-100 selection:bg-flowcare-primary/30 selection:text-flowcare-primary-dark dark:selection:text-flowcare-primary-light relative flex flex-col overflow-x-clip">
             {/* Global Background Elements */}
             <div className="fixed inset-0 bg-slate-50 dark:bg-slate-900 -z-50"></div>
-            <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay pointer-events-none -z-40"></div>
 
-            <Header />
-
-            <main className="flex-grow flex items-center justify-center p-6 relative z-10">
+            <main className="flex-grow flex items-center justify-center py-12 px-6 relative z-10">
                 <div className="glass-card p-10 rounded-[2.5rem] shadow-sm border border-gray-200 dark:border-gray-800 w-full max-w-md animate-fade-up">
                     <div className="text-center mb-8">
                         <h2 className="text-3xl font-bold font-heading text-gray-900 dark:text-white tracking-tight">{t('reg_title')}</h2>
@@ -87,7 +83,7 @@ export default function RegisterPage() {
                             <input
                                 type="email"
                                 required
-                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-flowcare-primary/50 focus:border-flowcare-primary outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600/50 focus:border-flowcare-primary outline-none transition-all"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                             />
@@ -99,7 +95,7 @@ export default function RegisterPage() {
                                 <input
                                     type="tel"
                                     required
-                                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-flowcare-primary/50 focus:border-flowcare-primary outline-none transition-all"
+                                    className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600/50 focus:border-flowcare-primary outline-none transition-all"
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
                                 />
@@ -111,7 +107,7 @@ export default function RegisterPage() {
                             <input
                                 type="password"
                                 required
-                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-flowcare-primary/50 focus:border-flowcare-primary outline-none transition-all"
+                                className="w-full px-4 py-3 rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 text-gray-900 dark:text-white focus:ring-2 focus:ring-blue-600/50 focus:border-flowcare-primary outline-none transition-all"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />

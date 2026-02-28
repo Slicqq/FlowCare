@@ -40,7 +40,7 @@ export default function PricingSection() {
                     </div>
 
                     {/* Provider Card */}
-                    <div className="glass-card rounded-[2.5rem] shadow-xl overflow-hidden border border-flowcare-primary/30 dark:border-flowcare-primary/50 relative flex flex-col group transform md:scale-105 z-10 bg-white dark:bg-gray-900">
+                    <div className="glass-card rounded-[2.5rem] shadow-xl overflow-hidden border border-blue-600/30 dark:border-blue-600/50 relative flex flex-col group transform md:scale-105 z-10 bg-white dark:bg-gray-900">
                         <div className="absolute top-0 inset-x-0 h-2 bg-flowcare-primary"></div>
                         <div className="absolute top-8 right-8 bg-flowcare-primary text-white text-xs font-bold px-4 py-1.5 rounded-full shadow-sm uppercase tracking-wider">Popular</div>
 
@@ -52,15 +52,15 @@ export default function PricingSection() {
                         <div className="p-10 bg-gray-50/30 dark:bg-gray-800/30 flex-grow flex flex-col justify-between">
                             <ul className="space-y-5">
                                 <li className="flex items-center text-gray-800 dark:text-gray-200 font-medium">
-                                    <CheckCircle2 className="h-5 w-5 text-flowcare-accent mr-3 shrink-0" />
+                                    <CheckCircle2 className="h-5 w-5 text-flowcare-primary mr-3 shrink-0" />
                                     Interactive Queue Management
                                 </li>
                                 <li className="flex items-center text-gray-800 dark:text-gray-200 font-medium">
-                                    <CheckCircle2 className="h-5 w-5 text-flowcare-accent mr-3 shrink-0" />
+                                    <CheckCircle2 className="h-5 w-5 text-flowcare-primary mr-3 shrink-0" />
                                     Patient Flow Analytics Dashboards
                                 </li>
                                 <li className="flex items-center text-gray-800 dark:text-gray-200 font-medium">
-                                    <CheckCircle2 className="h-5 w-5 text-flowcare-accent mr-3 shrink-0" />
+                                    <CheckCircle2 className="h-5 w-5 text-flowcare-primary mr-3 shrink-0" />
                                     Staff Optimization Tools
                                 </li>
                             </ul>

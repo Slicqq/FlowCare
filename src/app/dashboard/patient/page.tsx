@@ -33,7 +33,7 @@ export default function PatientDashboardHome() {
             </div>
 
             <div className="grid md:grid-cols-2 gap-6">
-                <div className="bg-white rounded-2xl shadow-sm p-6 border-t-4 border-[#00A389] hover:shadow-md transition">
+                <div className="bg-white rounded-2xl shadow-sm p-6 border-t-4 border-[var(--color-flowcare-primary)] hover:shadow-md transition">
                     <h2 className="text-xl font-semibold text-gray-800 mb-4">Your Next Appointment</h2>
 
                     {loading ? (

@@ -35,7 +35,7 @@ export default function ProviderAnalyticsPage() {
                 <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
                     <p className="text-sm font-semibold text-gray-500 uppercase mb-1">Flow Score</p>
                     <div className="flex items-baseline gap-2">
-                        <h3 className="text-3xl font-bold text-[#00A389]">92</h3>
+                        <h3 className="text-3xl font-bold text-[var(--color-flowcare-primary)]">92</h3>
                         <span className="text-sm text-gray-500 font-medium">/100</span>
                     </div>
                     <p className="text-xs text-gray-500 font-medium mt-2">Excellent flow</p>
@@ -57,7 +57,7 @@ export default function ProviderAnalyticsPage() {
                                 <div className="text-xs text-gray-400 font-medium mb-2 opacity-0 group-hover:opacity-100 transition">{val}m</div>
                                 <div
                                     style={{ height }}
-                                    className={`w-full rounded-t-sm transition-all duration-500 ease-out ${isPeak ? 'bg-[#FFC107] hover:bg-yellow-500' : 'bg-[#607d8b] hover:bg-opacity-90'}`}
+                                    className={`w-full rounded-t-sm transition-all duration-500 ease-out ${isPeak ? 'bg-[#FFC107] hover:bg-yellow-500' : 'bg-flowcare-accent hover:opacity-90'}`}
                                 ></div>
                                 <div className="text-sm text-gray-500 font-medium mt-3">{days[idx]}</div>
                             </div>

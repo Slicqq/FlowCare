@@ -91,7 +91,7 @@ export default function ProviderQueuePage() {
                 {/* Left Col: Queue Display */}
                 <div className="lg:col-span-2 space-y-6">
                     <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-                        <div className="bg-[#607d8b] p-4 flex justify-between items-center text-white">
+                        <div className="bg-flowcare-accent p-4 flex justify-between items-center text-white">
                             <h2 className="text-lg font-bold">Current Queue</h2>
                             <span className="font-semibold px-3 py-1 bg-white/20 rounded-full text-sm">
                                 {queue.length} Patients
