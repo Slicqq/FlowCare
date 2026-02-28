@@ -2,8 +2,6 @@
 
 import React, { useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, addDoc, serverTimestamp } from 'firebase/firestore';
 
 const mockClinics = [
     { id: 1, name: "Sahyadri Super Speciality Hospital", specialty: "General Practice", address: "Deccan Gymkhana, Pune", distance: "1.5 km", rating: 4.8, traffic: "LOW", waitTime: "< 10 mins" },
@@ -42,24 +40,10 @@ export default function FindClinicsPage() {
         setBookingLoading(true);
         setBookingSuccess('');
 
-        const formData = new FormData(e.currentTarget);
-        const date = formData.get('date') as string;
-        const time = formData.get('time') as string;
-        const note = formData.get('note') as string;
-
         try {
-            await addDoc(collection(db, 'appointments'), {
-                patientId: user.uid,
-                patientName: user.email?.split('@')[0] || 'Patient',
-                clinicId: bookingClinic.id,
-                clinicName: bookingClinic.name,
-                specialty: bookingClinic.specialty,
-                date,
-                time,
-                note,
-                status: 'pending',
-                timestamp: serverTimestamp()
-            });
+            // Mock delayed booking
+            await new Promise(resolve => setTimeout(resolve, 800));
+
             setBookingSuccess(`Your appointment at ${bookingClinic.name} has been requested.`);
             setTimeout(() => {
                 setBookingClinic(null);

@@ -50,21 +50,21 @@ export default function ProviderAnalyticsPage() {
                     {/* Mock Bars */}
                     {[15, 22, 18, 30, 25, 12, 18].map((val, idx) => {
                         const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-                        const height = \`\${(val / 30) * 100}%\`;
-             const isPeak = val >= 25;
-                    return (
-                    <div key={idx} className="flex flex-col items-center flex-1 group">
-                        <div className="text-xs text-gray-400 font-medium mb-2 opacity-0 group-hover:opacity-100 transition">{val}m</div>
-                        <div
-                            style={{ height }}
-                            className={\`w-full rounded-t-sm transition-all duration-500 ease-out \${isPeak ? 'bg-[#FFC107] hover:bg-yellow-500' : 'bg-[#607d8b] hover:bg-opacity-90'}\`}
-                 ></div>
-                    <div className="text-sm text-gray-500 font-medium mt-3">{days[idx]}</div>
+                        const height = `${(val / 30) * 100}%`;
+                        const isPeak = val >= 25;
+                        return (
+                            <div key={idx} className="flex flex-col items-center flex-1 group">
+                                <div className="text-xs text-gray-400 font-medium mb-2 opacity-0 group-hover:opacity-100 transition">{val}m</div>
+                                <div
+                                    style={{ height }}
+                                    className={`w-full rounded-t-sm transition-all duration-500 ease-out ${isPeak ? 'bg-[#FFC107] hover:bg-yellow-500' : 'bg-[#607d8b] hover:bg-opacity-90'}`}
+                                ></div>
+                                <div className="text-sm text-gray-500 font-medium mt-3">{days[idx]}</div>
+                            </div>
+                        );
+                    })}
                 </div>
-                );
-           })}
             </div>
         </div>
-    </div >
-  );
+    );
 }

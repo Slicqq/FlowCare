@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, limit, onSnapshot } from 'firebase/firestore';
 import Link from 'next/link';
 
 export default function PatientDashboardHome() {
@@ -14,24 +12,17 @@ export default function PatientDashboardHome() {
     useEffect(() => {
         if (!user) return;
 
-        const q = query(
-            collection(db, 'appointments'),
-            where('patientId', '==', user.uid),
-            where('status', '==', 'approved'),
-            orderBy('timestamp', 'asc'),
-            limit(1)
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            if (!snapshot.empty) {
-                setNextAppt(snapshot.docs[0].data());
-            } else {
-                setNextAppt(null);
-            }
+        // Mock data fetch
+        setTimeout(() => {
+            setNextAppt({
+                clinicName: 'City Central Clinic',
+                specialty: 'General Practice',
+                date: 'Oct 24, 2024',
+                time: '14:30 PM'
+            });
             setLoading(false);
-        });
+        }, 800);
 
-        return () => unsubscribe();
     }, [user]);
 
     return (

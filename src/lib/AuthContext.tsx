@@ -1,20 +1,26 @@
 'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { onAuthStateChanged, User } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from './firebase';
+
+export interface User {
+    uid: string;
+    email: string | null;
+}
 
 interface AuthContextType {
     user: User | null;
     role: 'patient' | 'provider' | null;
     loading: boolean;
+    loginMock: (user: User, role: 'patient' | 'provider') => void;
+    logoutMock: () => void;
 }
 
 const AuthContext = createContext<AuthContextType>({
     user: null,
     role: null,
     loading: true,
+    loginMock: () => { },
+    logoutMock: () => { },
 });
 
 export const useAuth = () => useContext(AuthContext);
@@ -25,35 +31,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, async (firebaseUser) => {
-            if (firebaseUser) {
-                setUser(firebaseUser);
+        // Mock auth state check
+        const storedUser = localStorage.getItem('mock_user');
+        const storedRole = localStorage.getItem('mock_role');
 
-                try {
-                    // Fetch the user's role from Firestore
-                    const userDoc = await getDoc(doc(db, 'users', firebaseUser.uid));
-                    if (userDoc.exists()) {
-                        setRole(userDoc.data().role as 'patient' | 'provider');
-                    } else {
-                        setRole(null);
-                        console.warn("User authenticated but no corresponding 'users' document found.");
-                    }
-                } catch (error) {
-                    console.error("Error fetching user role:", error);
-                    setRole(null);
-                }
-            } else {
-                setUser(null);
-                setRole(null);
+        if (storedUser && (storedRole === 'patient' || storedRole === 'provider')) {
+            try {
+                setUser(JSON.parse(storedUser));
+                setRole(storedRole);
+            } catch (e) {
+                console.error("Failed to parse stored user", e);
             }
-            setLoading(false);
-        });
-
-        return () => unsubscribe();
+        }
+        setLoading(false);
     }, []);
 
+    const loginMock = (newUser: User, newRole: 'patient' | 'provider') => {
+        setUser(newUser);
+        setRole(newRole);
+        localStorage.setItem('mock_user', JSON.stringify(newUser));
+        localStorage.setItem('mock_role', newRole);
+    };
+
+    const logoutMock = () => {
+        setUser(null);
+        setRole(null);
+        localStorage.removeItem('mock_user');
+        localStorage.removeItem('mock_role');
+    };
+
     return (
-        <AuthContext.Provider value={{ user, role, loading }}>
+        <AuthContext.Provider value={{ user, role, loading, loginMock, logoutMock }}>
             {children}
         </AuthContext.Provider>
     );

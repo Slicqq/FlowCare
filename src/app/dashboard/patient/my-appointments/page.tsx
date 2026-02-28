@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, onSnapshot } from 'firebase/firestore';
 
 export default function MyAppointmentsPage() {
     const { user } = useAuth();
@@ -13,19 +11,15 @@ export default function MyAppointmentsPage() {
     useEffect(() => {
         if (!user) return;
 
-        const q = query(
-            collection(db, 'appointments'),
-            where('patientId', '==', user.uid),
-            orderBy('timestamp', 'desc')
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const apptsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setAppointments(apptsData);
+        // Mock data fetch
+        setTimeout(() => {
+            setAppointments([
+                { id: '1', clinicName: 'City Central Clinic', specialty: 'General Practice', date: 'Oct 24, 2024', time: '14:30 PM', status: 'approved' },
+                { id: '2', clinicName: 'Valley Health Center', specialty: 'Dermatology', date: 'Sep 15, 2024', time: '10:00 AM', status: 'completed' }
+            ]);
             setLoading(false);
-        });
+        }, 800);
 
-        return () => unsubscribe();
     }, [user]);
 
     const getStatusBadge = (status: string) => {

@@ -4,11 +4,10 @@ import React, { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthContext';
-import { auth } from '@/lib/firebase';
 import Image from 'next/image';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
-    const { user, role, loading } = useAuth();
+    const { user, role, loading, logoutMock } = useAuth();
     const router = useRouter();
 
     useEffect(() => {
@@ -30,7 +29,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     }
 
     const handleLogout = async () => {
-        await auth.signOut();
+        logoutMock();
         router.push('/');
     };
 

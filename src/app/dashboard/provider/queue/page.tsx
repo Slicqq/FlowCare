@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc, addDoc, serverTimestamp } from 'firebase/firestore';
 
 export default function ProviderQueuePage() {
     const { user } = useAuth();
@@ -23,37 +21,26 @@ export default function ProviderQueuePage() {
     useEffect(() => {
         if (!user) return;
 
-        // We fetch appointments for this clinic that are either "waiting" or "in_room"
-        const q = query(
-            collection(db, 'appointments'),
-            where('clinicId', '==', clinicId),
-            // Firebase doesn't support logical OR natively in simple queries without `in` which requires an array
-            where('status', 'in', ['waiting', 'in_room']),
-            // Note: Ordering might require a composite index if combining `in` and `orderBy`
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            // Sort in memory to avoid needing to manually create an index just for the prototype
-            const queueData = snapshot.docs
-                .map(doc => ({ id: doc.id, ...doc.data() }))
-                .sort((a: any, b: any) => {
-                    const timeA = a.timestamp?.toMillis() || 0;
-                    const timeB = b.timestamp?.toMillis() || 0;
-                    return timeA - timeB;
-                });
-
-            setQueue(queueData);
+        // Mock data fetch
+        setTimeout(() => {
+            setQueue([
+                { id: '1', patientName: 'Alice Smith', status: 'in_room', time: '09:00 AM', note: 'Follow up' },
+                { id: '2', patientName: 'Bob Johnson', status: 'waiting', time: '09:30 AM', note: 'Consultation' }
+            ]);
             setLoading(false);
-        });
+        }, 800);
 
-        return () => unsubscribe();
     }, [user]);
 
     const handleUpdateStatus = async (appointmentId: string, action: 'move' | 'complete') => {
         const newStatus = action === 'move' ? 'in_room' : 'completed';
         try {
-            const apptRef = doc(db, 'appointments', appointmentId);
-            await updateDoc(apptRef, { status: newStatus });
+            // Mock update
+            if (action === 'complete') {
+                setQueue(prev => prev.filter(q => q.id !== appointmentId));
+            } else {
+                setQueue(prev => prev.map(q => q.id === appointmentId ? { ...q, status: newStatus } : q));
+            }
         } catch (error) {
             console.error('Error updating status:', error);
             alert('Failed to update status.');
@@ -65,7 +52,9 @@ export default function ProviderQueuePage() {
         if (!patientName.trim()) return;
 
         try {
-            await addDoc(collection(db, 'appointments'), {
+            // Mock add doc
+            const newAppt = {
+                id: 'mock-' + Date.now(),
                 patientId: 'walk-in',
                 patientName: patientName.trim(),
                 phone: phone.trim(),
@@ -76,9 +65,10 @@ export default function ProviderQueuePage() {
                 time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
                 note: reason.trim() || 'Walk-in / General Check-up',
                 status: 'waiting',
-                timestamp: serverTimestamp()
-            });
+                timestamp: Date.now()
+            };
 
+            setQueue(prev => [...prev, newAppt]);
             setPatientName('');
             setPhone('');
             setReason('');

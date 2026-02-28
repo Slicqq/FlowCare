@@ -2,8 +2,6 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/AuthContext';
-import { db } from '@/lib/firebase';
-import { collection, query, where, orderBy, onSnapshot, doc, updateDoc } from 'firebase/firestore';
 import Link from 'next/link';
 
 export default function ProviderDashboardHome() {
@@ -17,26 +15,20 @@ export default function ProviderDashboardHome() {
     useEffect(() => {
         if (!user) return;
 
-        const q = query(
-            collection(db, 'appointments'),
-            where('clinicId', '==', clinicId),
-            where('status', '==', 'pending'),
-            orderBy('timestamp', 'asc')
-        );
-
-        const unsubscribe = onSnapshot(q, (snapshot) => {
-            const requestsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-            setRequests(requestsData);
+        // Mock data fetch
+        setTimeout(() => {
+            setRequests([
+                { id: '1', patientName: 'John Doe', date: 'Oct 24, 2024', time: '14:30 PM', note: 'General Checkup' }
+            ]);
             setLoading(false);
-        });
+        }, 800);
 
-        return () => unsubscribe();
     }, [user]);
 
     const handleUpdateStatus = async (appointmentId: string, newStatus: string) => {
         try {
-            const apptRef = doc(db, 'appointments', appointmentId);
-            await updateDoc(apptRef, { status: newStatus });
+            // Mock update
+            setRequests(prev => prev.filter(req => req.id !== appointmentId));
         } catch (error) {
             console.error('Error updating status:', error);
             alert('Failed to update status.');
