@@ -4,7 +4,6 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthContext';
-import Header from '@/components/layout/Header';
 import { useLanguage } from '@/lib/LanguageContext';
 
 export default function LoginPage() {
@@ -47,8 +46,6 @@ export default function LoginPage() {
             {/* Global Background Elements */}
             <div className="fixed inset-0 bg-slate-50 dark:bg-slate-900 -z-50"></div>
             <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay pointer-events-none -z-40"></div>
-
-            <Header />
 
             <main className="flex-grow flex items-center justify-center p-6 relative z-10">
                 <div className="glass-card p-10 rounded-[2.5rem] shadow-sm border border-gray-200 dark:border-gray-800 w-full max-w-md animate-fade-up">

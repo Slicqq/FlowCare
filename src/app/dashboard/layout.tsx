@@ -40,7 +40,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     return (
         <div className="flex h-screen bg-gray-100 font-sans">
             {/* Sidebar */}
-            <aside className={`w-64 bg-white shadow-lg flex flex-col ${isPatient ? 'border-t-4 border-[#00A389]' : 'border-t-4 border-[#607d8b]'}`}>
+            <aside className={`w-64 bg-white shadow-lg flex flex-col ${isPatient ? 'border-t-4 border-blue-600' : 'border-t-4 border-[#607d8b]'}`}>
                 <div className="p-6 pb-2 border-b">
                     <Link href={`/dashboard/${role}`} className="flex items-center gap-2">
                         <Image src="/Logo.png" alt="FlowCare Logo" width={32} height={32} />
