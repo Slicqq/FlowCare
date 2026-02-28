@@ -8,7 +8,7 @@ import Footer from '@/components/layout/Footer';
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen bg-transparent font-sans text-gray-900 dark:text-gray-100 selection:bg-flowcare-primary/30 selection:text-flowcare-primary-dark dark:selection:text-flowcare-primary-light relative">
+    <div className="min-h-screen bg-transparent font-sans text-gray-900 dark:text-gray-100 selection:bg-flowcare-primary/30 selection:text-flowcare-primary-dark dark:selection:text-flowcare-primary-light relative overflow-x-hidden">
       {/* Global Background Elements */}
       <div className="fixed inset-0 bg-slate-50 dark:bg-slate-900 -z-50"></div>
       <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay pointer-events-none -z-40"></div>

@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '@/lib/AuthContext';
+import Header from '@/components/layout/Header';
 import { useLanguage } from '@/lib/LanguageContext';
 
 export default function RegisterPage() {
@@ -47,6 +48,8 @@ export default function RegisterPage() {
             {/* Global Background Elements */}
             <div className="fixed inset-0 bg-slate-50 dark:bg-slate-900 -z-50"></div>
             <div className="fixed inset-0 bg-[url('/noise.png')] opacity-[0.015] dark:opacity-[0.03] mix-blend-overlay pointer-events-none -z-40"></div>
+
+            <Header />
 
             <main className="flex-grow flex items-center justify-center p-6 relative z-10">
                 <div className="glass-card p-10 rounded-[2.5rem] shadow-sm border border-gray-200 dark:border-gray-800 w-full max-w-md animate-fade-up">
@@ -124,7 +127,7 @@ export default function RegisterPage() {
                     </form>
 
                     <p className="text-center text-sm text-gray-600 dark:text-gray-400 mt-8 font-medium">
-                        {t('reg_already_user')} <Link href="/auth/login" className="font-bold text-flowcare-primary hover:text-flowcare-primary-dark transition-colors">{t('login_signin_text')}</Link>
+                        {t('login_signin')} <Link href="/auth/login" className="font-bold text-flowcare-primary hover:text-flowcare-primary-dark transition-colors">{t('login_signin_text')}</Link>
                     </p>
                 </div>
             </main>

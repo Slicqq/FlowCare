@@ -68,12 +68,12 @@ export default function FindClinicsPage() {
                 <input
                     type="text"
                     placeholder="Search clinic name or location..."
-                    className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none"
+                    className="flex-1 px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00A389] focus:outline-none"
                     value={searchTerm}
                     onChange={e => setSearchTerm(e.target.value)}
                 />
                 <select
-                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-600 focus:outline-none bg-white"
+                    className="px-4 py-2 border rounded-lg focus:ring-2 focus:ring-[#00A389] focus:outline-none bg-white"
                     value={specialtyFilter}
                     onChange={e => setSpecialtyFilter(e.target.value)}
                 >
@@ -149,11 +149,11 @@ export default function FindClinicsPage() {
                             <form onSubmit={handleBooking} className="space-y-4">
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Select Date</label>
-                                    <input type="date" name="date" required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" defaultValue={new Date().toISOString().split('T')[0]} />
+                                    <input type="date" name="date" required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A389] outline-none" defaultValue={new Date().toISOString().split('T')[0]} />
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Select Time Slot</label>
-                                    <select name="time" required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none bg-white">
+                                    <select name="time" required className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A389] outline-none bg-white">
                                         <option>10:00 AM - 10:30 AM</option>
                                         <option>11:30 AM - 12:00 PM</option>
                                         <option>02:00 PM - 02:30 PM</option>
@@ -162,7 +162,7 @@ export default function FindClinicsPage() {
                                 </div>
                                 <div>
                                     <label className="block text-sm font-medium text-gray-700 mb-1">Reason (Optional)</label>
-                                    <input type="text" name="note" placeholder="E.g. Fever, Follow-up" className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-600 outline-none" />
+                                    <input type="text" name="note" placeholder="E.g. Fever, Follow-up" className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#00A389] outline-none" />
                                 </div>
 
                                 <div className="pt-2">
